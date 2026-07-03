@@ -1,0 +1,10 @@
+{
+  "name": "bento-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python -m http.server 5173",
+    "preview": "python -m http.server 4173"
+  }
+}

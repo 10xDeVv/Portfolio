@@ -2,4 +2,5 @@ docs/profile-evidence.md
 public/assets/wayne-portrait.png
 public/assets/work-framerxplore.jpg
 node_modules/
+dist/
 .DS_Store

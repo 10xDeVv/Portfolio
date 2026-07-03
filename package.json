@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build.mjs",
     "dev": "python -m http.server 5173",
-    "preview": "python -m http.server 4173"
+    "preview": "python -m http.server 4173 --directory dist"
   }
 }

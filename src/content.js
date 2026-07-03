@@ -279,9 +279,9 @@ export const content = {
   contact: {
     name: "Adebowale Adebayo",
     nameLabel: "Name",
-    email: "Add public email in src/content.js",
+    email: "LinkedIn or GitHub DMs",
     emailInputType: "text",
-    emailLabel: "Contact",
+    emailLabel: "Best contact",
     message: "Tell me about the backend, platform, or full-stack role...",
     messageLabel: "Message",
   },

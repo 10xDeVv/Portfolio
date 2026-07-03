@@ -96,7 +96,7 @@ export const content = {
       description:
         "A backend-heavy route engine that generates scenic driving loops from a start point, time budget, and vibe, then returns most_scenic, balanced, and shorter options with route explanations.",
       category: "Async Route Engine",
-      image: "./public/assets/work-apple-navigation.webp",
+      image: "./public/assets/project-wayward.png",
       sizeClass: "work-standard",
       url: "https://usewayward.app",
       tags: ["Spring Boot", "Kafka", "PostGIS", "Redis", "OSRM"],
@@ -138,7 +138,7 @@ export const content = {
       description:
         "A production-ready web platform for moving files between devices with QR/code pairing, WebSocket coordination, temporary object storage, Supabase auth, and Stripe billing.",
       category: "Realtime File Transfer",
-      image: "./public/assets/portfolio-interface.png",
+      image: "./public/assets/project-lazydrop.png",
       sizeClass: "work-tall",
       url: "https://lazydrop.app",
       tags: ["Spring Boot", "Next.js", "WebSockets", "Stripe", "S3"],
@@ -180,7 +180,7 @@ export const content = {
       description:
         "An AI-assisted job application tracker that classifies Gmail job-search emails while keeping OAuth tokens in the browser and avoiding server-side email storage.",
       category: "Privacy-First AI Pipeline",
-      image: "./public/assets/work-realvantage.jpeg",
+      image: "./public/assets/project-wheredidiapply.png",
       sizeClass: "work-compact",
       url: "https://wheredidiapply.tech",
       tags: ["Spring WebFlux", "Next.js", "Gemini", "GCP", "OAuth"],
@@ -279,9 +279,9 @@ export const content = {
   contact: {
     name: "Adebowale Adebayo",
     nameLabel: "Name",
-    email: "Add public email in src/content.js",
+    email: "LinkedIn or GitHub DMs",
     emailInputType: "text",
-    emailLabel: "Contact",
+    emailLabel: "Best contact",
     message: "Tell me about the backend, platform, or full-stack role...",
     messageLabel: "Message",
   },

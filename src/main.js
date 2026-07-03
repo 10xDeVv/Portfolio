@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=4";
-import { appTemplate } from "./components.js?v=16";
+import { content } from "./content.js?v=5";
+import { appTemplate } from "./components.js?v=17";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -103,8 +103,8 @@ function restoreAnchorScroll() {
 }
 
 function createElasticTracker(element, handlers = {}) {
-  const speed = handlers.speed ?? 0.17;
-  const maxStretch = handlers.maxStretch ?? 0.42;
+  const speed = handlers.speed ?? 0.11;
+  const maxStretch = handlers.maxStretch ?? 0.18;
   const target = { x: 0, y: 0 };
   const previousTarget = { x: 0, y: 0 };
   const current = { x: 0, y: 0 };
@@ -123,11 +123,11 @@ function createElasticTracker(element, handlers = {}) {
     previousTarget.x = target.x;
     previousTarget.y = target.y;
 
-    const velocity = Math.min(Math.sqrt(deltaX ** 2 + deltaY ** 2) * 4, 150);
+    const velocity = Math.min(Math.sqrt(deltaX ** 2 + deltaY ** 2) * 3, 120);
     const scaleTarget = (velocity / 150) * maxStretch;
     currentScale += (scaleTarget - currentScale) * speed;
 
-    if (velocity > 20) {
+    if (velocity > 18) {
       currentAngle = (Math.atan2(deltaY, deltaX) * 180) / Math.PI;
     }
 
@@ -185,6 +185,8 @@ function createElasticTracker(element, handlers = {}) {
 function setupElasticEffects() {
   document.querySelectorAll(".card, .project-card, .project-detail-card, .project-visual").forEach((card) => {
     createElasticTracker(card, {
+      speed: 0.1,
+      maxStretch: 0.16,
       onFrame({ angle, scale, x, y }) {
         card.style.setProperty("--x", `${x}px`);
         card.style.setProperty("--y", `${y}px`);
@@ -199,7 +201,8 @@ function setupElasticEffects() {
 
   if (portraitCard) {
     createElasticTracker(portraitCard, {
-      maxStretch: 0.32,
+      speed: 0.13,
+      maxStretch: 0.22,
       onEnter() {
         portraitCard.classList.add("is-coloring");
       },

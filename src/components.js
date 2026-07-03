@@ -1,4 +1,4 @@
-import { content } from "./content.js";
+import { content } from "./content.js?v=3";
 
 const {
   contact,
@@ -320,10 +320,7 @@ function ContactCard() {
           <textarea class="textarea" id="message">${contact.message}</textarea>
         </div>
         <button class="submit-button" type="button">${labels.submit}</button>
-        <div class="contact-actions">
-          <a class="resume-link" href="${profile.resume}" target="_blank" rel="noreferrer">${labels.resume}</a>
-          <a class="github-link" href="${contact.githubHref}" target="_blank" rel="noreferrer">${contact.githubLabel}</a>
-        </div>
+        <a class="resume-link" href="${profile.resume}" target="_blank" rel="noreferrer">${labels.resume}</a>
       </form>
     `,
   });
@@ -342,7 +339,11 @@ function Footer() {
             .map(
               (item) => `
                 <a class="social-icon ${item.className}" href="${item.href || "#"}" target="_blank" rel="noreferrer" aria-label="${item.label}">
-                  <img src="${item.icon}" alt="" aria-hidden="true" />
+                  ${
+                    item.iconClass
+                      ? `<i class="${item.iconClass}" aria-hidden="true"></i>`
+                      : `<img src="${item.icon}" alt="" aria-hidden="true" />`
+                  }
                 </a>
               `
             )

@@ -1173,8 +1173,7 @@ img {
 }
 
 .submit-button,
-.resume-link,
-.github-link {
+.resume-link {
   width: 100%;
   min-height: 40px;
   display: grid;
@@ -1195,18 +1194,6 @@ img {
 .resume-link {
   border: 1px solid var(--border);
   background: var(--secondary);
-  color: var(--white);
-}
-
-.contact-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.github-link {
-  border: 1px solid var(--border);
-  background: var(--primary);
   color: var(--white);
 }
 
@@ -1237,7 +1224,7 @@ img {
 
 .social-grid {
   display: grid;
-  grid-template-columns: repeat(4, 67px);
+  grid-template-columns: repeat(3, 67px);
   gap: var(--gap);
   justify-content: end;
 }
@@ -1251,7 +1238,8 @@ img {
   transition: var(--transition);
 }
 
-.social-icon img {
+.social-icon img,
+.social-icon i {
   width: 30px;
   height: 30px;
   object-fit: contain;
@@ -1259,7 +1247,14 @@ img {
   transition: var(--transition);
 }
 
-.social-icon:hover img {
+.social-icon i {
+  color: var(--white);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.social-icon:hover img,
+.social-icon:hover i {
   opacity: 1;
 }
 
@@ -1277,6 +1272,10 @@ img {
 
 .social-icon.x:hover {
   background: rgb(0, 0, 0);
+}
+
+.social-icon.github:hover {
+  background: rgb(36, 41, 47);
 }
 
 .js-enabled .navbar,
@@ -1622,7 +1621,7 @@ img {
   }
 
   .social-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     justify-content: stretch;
   }
 
@@ -1646,7 +1645,12 @@ img {
     background: rgb(0, 0, 0);
   }
 
-  .social-icon img {
+  .social-icon.github {
+    background: rgb(36, 41, 47);
+  }
+
+  .social-icon img,
+  .social-icon i {
     opacity: 1;
   }
 }

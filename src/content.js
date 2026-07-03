@@ -284,8 +284,6 @@ export const content = {
     emailLabel: "Contact",
     message: "Tell me about the backend, platform, or full-stack role...",
     messageLabel: "Message",
-    githubLabel: "GitHub",
-    githubHref: "https://github.com/10xDeVv",
   },
 
   footer: {
@@ -295,9 +293,9 @@ export const content = {
 
   socialLinks: [
     {
-      label: "GitHub",
+      label: "X",
       className: "x",
-      href: "https://github.com/10xDeVv",
+      href: "#",
       icon: "https://framerusercontent.com/images/aIwWFUypFKxfKGudhpCCga16zE.svg",
     },
     {
@@ -305,6 +303,12 @@ export const content = {
       className: "linkedin",
       href: "https://www.linkedin.com/in/waally-xyz/",
       icon: "https://framerusercontent.com/images/ASxlMuKNCokyakmccfoA0Qjd7A.svg",
+    },
+    {
+      label: "GitHub",
+      className: "github",
+      href: "https://github.com/10xDeVv",
+      iconClass: "devicon-github-original",
     },
   ],
 };

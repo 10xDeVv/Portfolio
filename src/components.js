@@ -195,7 +195,7 @@ function ProjectDetailPage(project) {
             <p>${project.headline}</p>
           </div>
           <a class="visit-link" href="${project.url}" target="_blank" rel="noreferrer">
-            Visit Repo ${arrow}
+            Visit Site ${arrow}
           </a>
         </section>
         <div class="project-tags detail-tags">
@@ -283,6 +283,7 @@ function QuoteCard() {
   return Card({
     className: "quote-card",
     children: `
+      <h2 class="quote-heading">${labels.motivation}</h2>
       <p class="quote-mark">"</p>
       <p class="quote-text">${content.quote}</p>
     `,
@@ -319,7 +320,10 @@ function ContactCard() {
           <textarea class="textarea" id="message">${contact.message}</textarea>
         </div>
         <button class="submit-button" type="button">${labels.submit}</button>
-        <a class="resume-link" href="${profile.resume}" target="_blank" rel="noreferrer">${labels.resume}</a>
+        <div class="contact-actions">
+          <a class="resume-link" href="${profile.resume}" target="_blank" rel="noreferrer">${labels.resume}</a>
+          <a class="github-link" href="${contact.githubHref}" target="_blank" rel="noreferrer">${contact.githubLabel}</a>
+        </div>
       </form>
     `,
   });

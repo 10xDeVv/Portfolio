@@ -39,6 +39,7 @@ export const content = {
     featuredWork: "Projects",
     toolbox: "Technologies",
     contact: "Contact",
+    motivation: "Motivation",
     availability: "Seeking Software Engineering Internships",
     submit: "Submit",
     resume: "Download Resume",
@@ -97,7 +98,7 @@ export const content = {
       category: "Async Route Engine",
       image: "./public/assets/work-apple-navigation.webp",
       sizeClass: "work-standard",
-      url: "https://github.com/10xDeVv/Wayward",
+      url: "https://usewayward.app",
       tags: ["Spring Boot", "Kafka", "PostGIS", "Redis", "OSRM"],
       overview:
         "Wayward turns a vague request like a scenic one-hour drive into real route options. The web app submits a job, backend workers pick road-aware anchors, OSRM builds legal drivable loops, and the system scores returned corridors against precomputed scenic tiles.",
@@ -139,7 +140,7 @@ export const content = {
       category: "Realtime File Transfer",
       image: "./public/assets/portfolio-interface.png",
       sizeClass: "work-tall",
-      url: "https://github.com/10xDeVv/LazyDrop",
+      url: "https://lazydrop.app",
       tags: ["Spring Boot", "Next.js", "WebSockets", "Stripe", "S3"],
       overview:
         "LazyDrop is built around the simplest user flow possible: create a session, share a code or QR, and move files between any devices without setup. Underneath that simple flow is a backend that owns sessions, participants, signed uploads, billing, and cleanup.",
@@ -181,7 +182,7 @@ export const content = {
       category: "Privacy-First AI Pipeline",
       image: "./public/assets/work-realvantage.jpeg",
       sizeClass: "work-compact",
-      url: "https://github.com/10xDeVv/WhereDidIApply",
+      url: "https://wheredidiapply.tech",
       tags: ["Spring WebFlux", "Next.js", "Gemini", "GCP", "OAuth"],
       overview:
         "WhereDidIApply turns a messy inbox into a job-search dashboard. The browser fetches Gmail messages with read-only OAuth, sends only email text for classification, and stores results locally so the backend remains stateless.",
@@ -283,6 +284,8 @@ export const content = {
     emailLabel: "Contact",
     message: "Tell me about the backend, platform, or full-stack role...",
     messageLabel: "Message",
+    githubLabel: "GitHub",
+    githubHref: "https://github.com/10xDeVv",
   },
 
   footer: {

@@ -11,13 +11,23 @@ export const content = {
 
   profile: {
     name: "Adebowale Adebayo",
-    role: "Backend and full-stack software engineer",
+    role: "Backend / Cloud / Full-Stack SWE Intern",
     location: "Fredericton, Canada",
-    email: "",
-    contactHref: "https://www.linkedin.com/in/waally-xyz/",
+    email: "adebowale.ca@gmail.com",
+    contactHref: "mailto:adebowale.ca@gmail.com",
     resume: "./public/assets/resume.pdf",
     intro:
-      "I'm Wale, a CS student at UNB. I love building and engineering backend/cloud systems: the distributed pieces, data flows, queues, APIs, and reliability work behind the products people depend on every day. Most of my projects start as personal itches: something I need, something that annoys me, or something I think should exist. Then they turn into backend-heavy products with real infrastructure behind them. I care just as much about the parts people actually touch. A polished interface is what lets the engineering underneath matter, so the skyscraper users see should feel as intentional as the foundation holding it up.",
+      "I'm Wale, a CS student at UNB. I love building and engineering backend/cloud systems: the distributed pieces, data flows, queues, APIs, and reliability work behind the products people depend on every day.",
+    introDetail:
+      "Most of my projects start as personal itches, then turn into backend-heavy products with real infrastructure behind them. I care just as much about the interface: the skyscraper users see should feel as intentional as the foundation holding it up.",
+    proofChips: ["Backend-heavy products", "Cloud + distributed systems", "Product-minded UI/UX"],
+    heroMeta: ["CS @ UNB", "Fredericton, Canada", "Backend / Cloud / Full-stack"],
+    contactLinks: [
+      { label: "Email", href: "mailto:adebowale.ca@gmail.com" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/waally-xyz/" },
+      { label: "GitHub", href: "https://github.com/10xDeVv" },
+      { label: "Resume", href: "./public/assets/resume.pdf" },
+    ],
     portrait: {
       src: "./public/assets/adebowale-portrait.jpg",
       alt: "Portrait of Adebowale Adebayo",
@@ -40,7 +50,6 @@ export const content = {
     toolbox: "Technologies",
     contact: "Contact",
     motivation: "Motivation",
-    availability: "Seeking Software Engineering Internships",
     submit: "Submit",
     resume: "Download Resume",
   },
@@ -97,8 +106,12 @@ export const content = {
         "A full-stack scenic route platform that turns a start point, time budget, and vibe into legal drivable loop options scored against precomputed H3 scenic intelligence.",
       category: "Geospatial Route Platform",
       image: "./public/assets/project-wayward.png",
-      sizeClass: "work-standard",
       url: "https://usewayward.app",
+      proof: "Kafka + OSRM + PostGIS scenic route engine · 27 route-quality scenarios · 211k H3 scenic tiles",
+      links: [
+        { label: "Live Site", href: "https://usewayward.app" },
+        { label: "Case Study", href: "#project/wayward" },
+      ],
       tags: ["Spring Boot", "Kafka", "PostGIS", "Redis", "OSRM", "H3", "Next.js", "Mapbox"],
       overview:
         "Wayward is a scenic driving route generator for the question normal navigation apps do not answer: I have 45 to 90 minutes, I am starting here, and I want a coastal, forest, mountain, quiet, countryside, open-road, photo-worthy, or hidden-gem drive. The system persists a route job, processes it asynchronously, generates candidate loop shapes, asks local OSRM for legal road geometry, samples the returned corridor against scenic H3 tiles, and returns most_scenic, balanced, and shorter options.",
@@ -233,8 +246,12 @@ export const content = {
         "A production-ready web platform for moving files between devices with QR/code pairing, WebSocket coordination, temporary object storage, Supabase auth, and Stripe billing.",
       category: "Realtime File Transfer",
       image: "./public/assets/project-lazydrop.png",
-      sizeClass: "work-tall",
       url: "https://lazydrop.app",
+      proof: "Realtime file transfer with signed uploads and Stripe plans · WebSocket sessions · cleanup jobs",
+      links: [
+        { label: "Live Site", href: "https://lazydrop.app" },
+        { label: "Case Study", href: "#project/lazydrop" },
+      ],
       tags: ["Next.js", "Spring Boot", "PostgreSQL", "WebSockets", "Stripe", "S3"],
       overview:
         "LazyDrop is a real-time, session-based file sharing platform. Users create temporary drop rooms, invite others through an 8-character code or QR link, and transfer files across devices with secure signed upload and download URLs. The product looks lightweight, but the backend handles authentication, guest access, WebSockets, object storage, Stripe subscriptions, plan enforcement, background cleanup, and CI/CD.",
@@ -365,8 +382,12 @@ export const content = {
         "An AI-assisted job application tracker that classifies Gmail job-search emails while keeping OAuth tokens in the browser and avoiding server-side email storage.",
       category: "Privacy-First AI Pipeline",
       image: "./public/assets/project-wheredidiapply.png",
-      sizeClass: "work-compact",
       url: "https://wheredidiapply.tech",
+      proof: "Privacy-first Gmail tracker · 1,500-email scan runs · 34 classification regex patterns",
+      links: [
+        { label: "Live Site", href: "https://wheredidiapply.tech" },
+        { label: "Case Study", href: "#project/wheredidiapply" },
+      ],
       tags: ["Next.js", "Spring Boot", "Gmail API", "Gemini", "OAuth", "GCP"],
       overview:
         "WhereDidIApply is a privacy-first job application tracker that turns a Gmail inbox into a structured job-search dashboard. The app connects to Gmail with read-only OAuth, searches for job-related emails, classifies them with a hybrid regex and Gemini pipeline, deduplicates results by normalized company and role, and displays applications in an editable, searchable, exportable dashboard.",
@@ -501,8 +522,12 @@ export const content = {
         "A backend migration that moved Spotlight from a frontend-heavy Supabase-direct model to server-owned APIs, PostgreSQL persistence, and WebSocket chat.",
       category: "Mobile Backend Migration",
       image: "./public/assets/work-axilab.jpg",
-      sizeClass: "work-compact",
       url: "https://github.com/10xDeVv",
+      proof: "Spring Boot backend migration · PostgreSQL-owned app data · STOMP realtime chat",
+      links: [
+        { label: "GitHub", href: "https://github.com/10xDeVv" },
+        { label: "Case Study", href: "#project/spotlight" },
+      ],
       tags: ["Spring Boot", "PostgreSQL", "Expo", "Supabase", "STOMP"],
       overview:
         "Spotlight is a React Native app for university students built around compatibility, lightweight messaging, weekly prompts, and real-world activities. I migrated the active app toward a backend-owned model while preserving Supabase Auth.",
@@ -556,12 +581,22 @@ export const content = {
 
   contact: {
     name: "Adebowale Adebayo",
+    email: "adebowale.ca@gmail.com",
+    headline: "Want to talk backend, cloud, platform, or full-stack product work?",
+    detail:
+      "Send me a note and your email client will open with the message addressed to me.",
     nameLabel: "Name",
-    email: "LinkedIn or GitHub DMs",
+    emailDefault: "LinkedIn or GitHub DMs",
     emailInputType: "text",
     emailLabel: "Best contact",
     message: "Tell me about the backend, platform, or full-stack role...",
     messageLabel: "Message",
+    links: [
+      { label: "Email me", href: "mailto:adebowale.ca@gmail.com" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/waally-xyz/" },
+      { label: "GitHub", href: "https://github.com/10xDeVv" },
+      { label: "Resume", href: "./public/assets/resume.pdf" },
+    ],
   },
 
   footer: {
@@ -573,7 +608,7 @@ export const content = {
     {
       label: "X",
       className: "x",
-      href: "#",
+      href: "https://x.com/10xxDeV",
       icon: "https://framerusercontent.com/images/aIwWFUypFKxfKGudhpCCga16zE.svg",
     },
     {

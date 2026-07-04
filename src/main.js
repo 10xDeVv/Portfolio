@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=6";
-import { appTemplate } from "./components.js?v=18";
+import { content } from "./content.js?v=8";
+import { appTemplate } from "./components.js?v=19";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -17,6 +17,7 @@ function render() {
   setupAnchorLinks();
   setupElasticEffects();
   setupMenu();
+  setupContactForm();
   restoreAnchorScroll();
 }
 
@@ -25,7 +26,6 @@ function setupReveal() {
     [
       ".project-card",
       ".toolbox-card",
-      ".availability-card",
       ".quote-card",
       ".contact-card",
       ".project-visual",
@@ -86,6 +86,27 @@ function setupMenu() {
   menuButton?.addEventListener("click", () => {
     const isOpen = header.classList.toggle("is-open");
     menuButton.setAttribute("aria-expanded", String(isOpen));
+  });
+}
+
+function setupContactForm() {
+  const form = document.querySelector(".contact-form");
+  if (!form) return;
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const contact = String(data.get("email") || "").trim();
+    const message = String(data.get("message") || "").trim();
+    const recipient = form.dataset.recipient || "adebowale.ca@gmail.com";
+    const subject = encodeURIComponent(`Portfolio contact${name ? ` from ${name}` : ""}`);
+    const body = encodeURIComponent(
+      [`Name: ${name || "Not provided"}`, `Best contact: ${contact || "Not provided"}`, "", message].join("\n")
+    );
+
+    window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
   });
 }
 

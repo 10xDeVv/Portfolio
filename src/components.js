@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=7";
+import { content } from "./content.js?v=8";
 
 const {
   contact,
@@ -17,6 +17,19 @@ const arrow = `
     <path d="M7 17 17 7M9 7h8v8" />
   </svg>
 `;
+const linkAttrs = (href) =>
+  href?.startsWith("#") ? "" : ' target="_blank" rel="noreferrer"';
+
+const renderLinks = (links = [], className = "action-links") => {
+  if (!links.length) return "";
+
+  return `
+    <div class="${className}">
+      ${links.map((link) => `<a href="${link.href}"${linkAttrs(link.href)}>${link.label}</a>`).join("")}
+    </div>
+  `;
+};
+
 
 export function appTemplate() {
   const activeProject = getActiveProject();
@@ -49,7 +62,6 @@ export function appTemplate() {
             ${ToolboxCard()}
             ${QuoteCard()}
             <div class="contact-stack">
-              ${AvailabilityCard()}
               ${ContactCard()}
             </div>
           </div>
@@ -93,7 +105,12 @@ function NameCard() {
   return Card({
     className: "name-card card-gradient",
     id: "about",
-    children: `<h1 class="hero-title">${profile.name.split(" ").join("<br />")}</h1>`,
+    children: `
+      <h1 class="hero-title">${profile.name.split(" ").join("<br />")}</h1>
+      <div class="hero-meta" aria-label="Profile summary">
+        ${profile.heroMeta.map((item) => `<span>${item}</span>`).join("")}
+      </div>
+    `,
   });
 }
 
@@ -109,9 +126,22 @@ function PortraitCard() {
 function BioCard() {
   return Card({
     className: "bio-card",
-    children: `<p class="body">${profile.intro}</p>`,
+    children: `
+      <div class="bio-copy">
+        <p class="body">${profile.intro}</p>
+        <p class="body body-muted">${profile.introDetail}</p>
+      </div>
+      <div class="proof-chip-list" aria-label="Engineering focus">
+        ${profile.proofChips.map((chip) => `<span>${chip}</span>`).join("")}
+      </div>
+      <div class="hero-contact-strip">
+        <p>Open to SWE internships</p>
+        ${renderLinks(profile.contactLinks, "hero-contact-links")}
+      </div>
+    `,
   });
 }
+
 
 function ExperienceCard() {
   return Card({
@@ -167,19 +197,22 @@ function ProjectCard(project) {
   const extraCount = Math.max(project.tags.length - visibleTags.length, 0);
 
   return `
-    <a class="project-card work-image-card" href="#project/${project.slug}" aria-label="Open ${project.title} project details">
-      <div class="project-media">
+    <article class="project-card work-image-card" aria-label="${project.title} project">
+      <a class="project-media" href="#project/${project.slug}" aria-label="Open ${project.title} case study">
         <img src="${project.image}" alt="${project.title}" />
-      </div>
+        <span class="project-media-overlay">View Case Study ${arrow}</span>
+      </a>
       <div class="project-card-body">
         <h3 class="project-title">${project.title}</h3>
         <p class="project-description">${project.description}</p>
+        <p class="project-proof">${project.proof}</p>
         <div class="project-tags" aria-label="${project.title} technologies">
           ${visibleTags.map((tag) => `<span>${tag}</span>`).join("")}
           ${extraCount ? `<span>+${extraCount}</span>` : ""}
         </div>
+        ${renderLinks(project.links, "project-action-links")}
       </div>
-    </a>
+    </article>
   `;
 }
 
@@ -194,9 +227,7 @@ function ProjectDetailPage(project) {
             <h1>${project.title}</h1>
             <p>${project.headline}</p>
           </div>
-          <a class="visit-link" href="${project.url}" target="_blank" rel="noreferrer">
-            Visit Site ${arrow}
-          </a>
+          ${renderLinks(project.links, "project-hero-links")}
         </section>
         <div class="project-tags detail-tags">
           ${project.tags.map((tag) => `<span>${tag}</span>`).join("")}
@@ -212,7 +243,7 @@ function ProjectDetailPage(project) {
         ${ProjectCardGrid("What Makes It Different", project.differentiators)}
         ${ProjectCardGrid("Key Features", project.features)}
         ${ProjectCardGrid("Results & Impact", project.impact)}
-        ${ProjectBulletSection("Resume-Ready Bullets", project.resumeBullets)}
+        ${ProjectBulletSection("Technical Contributions", project.resumeBullets)}
       </main>
     </div>
   `;
@@ -331,36 +362,27 @@ function QuoteCard() {
   });
 }
 
-function AvailabilityCard() {
-  return Card({
-    className: "availability-card",
-    children: `
-      <span class="availability-dot" aria-hidden="true"></span>
-      <p class="availability-text">${labels.availability}</p>
-    `,
-  });
-}
-
 function ContactCard() {
   return Card({
     className: "contact-card",
     id: "contact",
     children: `
       <h2 class="heading-3">${labels.contact}</h2>
-      <form class="contact-form">
+      <p class="contact-intro body body-muted">${contact.detail}</p>
+      <form class="contact-form" data-recipient="${contact.email}">
         <div class="form-field">
           <label class="body body-muted" for="name">${contact.nameLabel}</label>
-          <input class="input" id="name" type="text" value="${contact.name}" />
+          <input class="input" id="name" name="name" type="text" value="${contact.name}" />
         </div>
         <div class="form-field">
           <label class="body body-muted" for="email">${contact.emailLabel}</label>
-          <input class="input" id="email" type="${contact.emailInputType || "email"}" value="${contact.email}" />
+          <input class="input" id="email" name="email" type="${contact.emailInputType || "email"}" value="${contact.emailDefault}" />
         </div>
         <div class="form-field">
           <label class="body body-muted" for="message">${contact.messageLabel}</label>
-          <textarea class="textarea" id="message">${contact.message}</textarea>
+          <textarea class="textarea" id="message" name="message">${contact.message}</textarea>
         </div>
-        <button class="submit-button" type="button">${labels.submit}</button>
+        <button class="submit-button" type="submit">${labels.submit}</button>
         <a class="resume-link" href="${profile.resume}" target="_blank" rel="noreferrer">${labels.resume}</a>
       </form>
     `,

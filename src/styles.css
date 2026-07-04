@@ -894,6 +894,38 @@ img {
   gap: 28px;
 }
 
+.project-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.project-metric-card {
+  min-height: 148px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--primary);
+}
+
+.project-metric-card strong {
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.project-metric-card span {
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
 .project-detail-card {
   min-height: 240px;
   padding: 28px;
@@ -914,6 +946,37 @@ img {
   font-family: var(--font-body);
   font-size: 19px;
   line-height: 1.45;
+}
+
+.project-bullet-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-bullet-list li {
+  position: relative;
+  padding: 18px 22px 18px 48px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--primary);
+  color: rgb(210, 210, 210);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.project-bullet-list li::before {
+  position: absolute;
+  top: 24px;
+  left: 22px;
+  width: 8px;
+  height: 8px;
+  content: "";
+  border-radius: 50%;
+  background: var(--green);
 }
 
 .more-grid {
@@ -1383,6 +1446,10 @@ img {
     grid-template-columns: 1fr 1fr;
   }
 
+  .project-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .more-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1590,8 +1657,22 @@ img {
     gap: var(--gap);
   }
 
+  .project-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .project-text-section p {
     font-size: 20px;
+  }
+
+  .project-bullet-list li {
+    padding: 16px 18px 16px 40px;
+    font-size: 16px;
+  }
+
+  .project-bullet-list li::before {
+    top: 22px;
+    left: 18px;
   }
 
   .toolbox-card {

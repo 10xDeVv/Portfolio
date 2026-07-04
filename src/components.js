@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=5";
+import { content } from "./content.js?v=6";
 
 const {
   contact,
@@ -207,8 +207,12 @@ function ProjectDetailPage(project) {
         ${ProjectTextSection("Overview", project.overview)}
         ${ProjectTextSection("The Problem", project.problem)}
         ${ProjectTextSection("The Solution", project.solution)}
+        ${ProjectMetricGrid(project.metrics)}
+        ${ProjectCardGrid("Architecture Highlights", project.architecture)}
+        ${ProjectCardGrid("What Makes It Different", project.differentiators)}
         ${ProjectCardGrid("Key Features", project.features)}
         ${ProjectCardGrid("Results & Impact", project.impact)}
+        ${ProjectBulletSection("Resume-Ready Bullets", project.resumeBullets)}
       </main>
     </div>
   `;
@@ -224,6 +228,8 @@ function ProjectTextSection(title, text) {
 }
 
 function ProjectCardGrid(title, items) {
+  if (!items?.length) return "";
+
   return `
     <section class="project-detail-section">
       <h2>${title}</h2>
@@ -239,6 +245,41 @@ function ProjectCardGrid(title, items) {
           )
           .join("")}
       </div>
+    </section>
+  `;
+}
+
+function ProjectMetricGrid(items) {
+  if (!items?.length) return "";
+
+  return `
+    <section class="project-detail-section project-metrics-section">
+      <h2>Repo Metrics</h2>
+      <div class="project-metrics-grid">
+        ${items
+          .map(
+            (item) => `
+              <article class="project-metric-card">
+                <strong>${item.value}</strong>
+                <span>${item.label}</span>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function ProjectBulletSection(title, items) {
+  if (!items?.length) return "";
+
+  return `
+    <section class="project-detail-section">
+      <h2>${title}</h2>
+      <ul class="project-bullet-list">
+        ${items.map((item) => `<li>${item}</li>`).join("")}
+      </ul>
     </section>
   `;
 }

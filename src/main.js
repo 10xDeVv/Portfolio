@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=5";
-import { appTemplate } from "./components.js?v=17";
+import { content } from "./content.js?v=6";
+import { appTemplate } from "./components.js?v=18";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;

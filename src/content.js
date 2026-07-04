@@ -92,43 +92,137 @@ export const content = {
     {
       slug: "wayward",
       title: "Wayward",
-      headline: "Scenic route generation powered by async jobs, local OSRM, H3 scenic tiles, and PostGIS.",
+      headline: "Production-style geospatial routing that generates scenic driving loops from time, location, and route vibe.",
       description:
-        "A backend-heavy route engine that generates scenic driving loops from a start point, time budget, and vibe, then returns most_scenic, balanced, and shorter options with route explanations.",
-      category: "Async Route Engine",
+        "A full-stack scenic route platform that turns a start point, time budget, and vibe into legal drivable loop options scored against precomputed H3 scenic intelligence.",
+      category: "Geospatial Route Platform",
       image: "./public/assets/project-wayward.png",
       sizeClass: "work-standard",
       url: "https://usewayward.app",
-      tags: ["Spring Boot", "Kafka", "PostGIS", "Redis", "OSRM"],
+      tags: ["Spring Boot", "Kafka", "PostGIS", "Redis", "OSRM", "H3", "Next.js", "Mapbox"],
       overview:
-        "Wayward turns a vague request like a scenic one-hour drive into real route options. The web app submits a job, backend workers pick road-aware anchors, OSRM builds legal drivable loops, and the system scores returned corridors against precomputed scenic tiles.",
+        "Wayward is a scenic driving route generator for the question normal navigation apps do not answer: I have 45 to 90 minutes, I am starting here, and I want a coastal, forest, mountain, quiet, countryside, open-road, photo-worthy, or hidden-gem drive. The system persists a route job, processes it asynchronously, generates candidate loop shapes, asks local OSRM for legal road geometry, samples the returned corridor against scenic H3 tiles, and returns most_scenic, balanced, and shorter options.",
       problem:
-        "Normal maps optimize for shortest or fastest routes. That ignores why someone might drive for fun: water, tree canopy, quieter roads, viewpoints, coastal moments, and a route shape that actually feels like a loop instead of an errand.",
+        "Traditional maps optimize for getting from A to B quickly. A recreational drive has a different contract: the route should loop back near the start, follow real roads, fit a time budget, avoid obvious backtracking, and match subjective scenic intent. Computing water, greenery, elevation, road stress, tree canopy, viewpoints, urban pressure, and bridge/coastal signals from raw spatial datasets during every request would also make the product too slow and expensive.",
       solution:
-        "I built the architecture around asynchronous route jobs. The API persists the request and publishes to Kafka; the worker loads H3 scenic features, generates candidate waypoint strategies, calls local OSRM, scores each result, persists the best options, and notifies the frontend when the job completes.",
-      features: [
+        "I built Wayward around an event-driven route-generation pipeline. The Next.js/Mapbox frontend submits a request to a Spring Boot API, the API stores a route_jobs row and publishes to Kafka, and a worker loads cached scenic tiles plus road-aware anchors before calling local OSRM /trip. The worker scores returned geometry against offline scenic-data releases, applies vibe contracts, dedupes candidates, persists route options and explanations, then sends completion or failure events through WebSockets with polling fallback.",
+      metrics: [
+        { value: "312", label: "tracked project files" },
+        { value: "144", label: "Java source files" },
+        { value: "33", label: "route-api Flyway migrations" },
+        { value: "49", label: "automation scripts" },
+        { value: "27", label: "route-quality scenarios" },
+        { value: "211,510", label: "v3.7 scenic H3 tiles validated" },
+        { value: "14,092", label: "non-zero viewpoint tiles" },
+        { value: "6,480", label: "non-zero bridge/coastal tiles" },
+      ],
+      architecture: [
         {
-          title: "Async route jobs",
-          detail: "Kafka-backed route generation keeps expensive routing work outside the request/response path.",
+          title: "Async route pipeline",
+          detail: "Route requests are persisted, published to Kafka, processed by route-worker services, and surfaced back through WebSocket notifications instead of blocking HTTP.",
         },
         {
-          title: "Precomputed scenic feature store",
-          detail: "PostGIS stores H3 tile vectors for water, green space, road stress, darkness, viewpoints, tree canopy, and related scenic signals.",
+          title: "Local OSRM for legal geometry",
+          detail: "Wayward lets OSRM solve road legality while custom code decides which candidate waypoints should shape the loop and whether the result matches the selected vibe.",
+        },
+        {
+          title: "H3/PostGIS scenic feature store",
+          detail: "Runtime scoring samples precomputed scenic_score_tiles for water, greenery, elevation, solitude, road stress, tree canopy, scenic POIs, viewpoints, and coastal moments.",
+        },
+        {
+          title: "Redis-backed lookup path",
+          detail: "Scenic tile, route result, road metadata, and regional popularity caches reduce repeated geospatial reads while preserving PostGIS as the source of truth.",
+        },
+        {
+          title: "Production compose stack",
+          detail: "The deployed stack includes Next.js, route-api, route-worker, notification-service, Postgres/PostGIS, Redis, Kafka/Zookeeper, OSRM, and Caddy TLS.",
+        },
+        {
+          title: "Versioned data releases",
+          detail: "OSRM datasets and scenic tile releases are built separately from app code so route-data upgrades can be evaluated, shipped, and rolled back intentionally.",
+        },
+      ],
+      differentiators: [
+        {
+          title: "Experience-first routing",
+          detail: "The product does not ask where the user wants to go; it finds a nearby drive worth taking based on available time and mood.",
+        },
+        {
+          title: "Offline scenic enrichment",
+          detail: "Expensive raw geospatial processing happens before release, not inside the user request path.",
+        },
+        {
+          title: "Vibe contracts",
+          detail: "The engine can return vibe_unavailable with alternatives when the local geography cannot honestly satisfy a requested mountain, coastal, forest, quiet, or photo-worthy route.",
+        },
+        {
+          title: "Explainable scoring",
+          detail: "Routes carry summaries, human reasons, component averages, weighted contributions, contract flags, and warnings instead of a mystery scenic score.",
+        },
+        {
+          title: "Multiple route profiles",
+          detail: "Successful jobs return most_scenic, balanced, and shorter options so users can trade off scenic strength, practicality, and duration fit.",
+        },
+        {
+          title: "QA as route contract",
+          detail: "Scenario baselines check completion, option count, duration fit, score spread, geometry separation, explanations, weak-vibe signals, and repeated-road risk.",
+        },
+      ],
+      features: [
+        {
+          title: "Scenic loop generation",
+          detail: "Generates loop-style driving routes from a start point, time budget, and selected route vibe.",
+        },
+        {
+          title: "Hybrid OSRM v2 engine",
+          detail: "Candidate strategies include sector rings, intent anchors, water-following, open-space escape, photo/viewpoint peaks, quiet roads, curvy/elevation, balanced variety, and rescue variants.",
+        },
+        {
+          title: "Scenic Match scoring",
+          detail: "Internal 0.0 to 1.0 quality scores are exposed as a user-readable 0 to 100 Scenic Match score.",
         },
         {
           title: "Route explanations",
-          detail: "Routes expose human-readable reasons, score breakdowns, contract flags, and warnings instead of just returning a black-box score.",
+          detail: "Returned options explain why they were selected using human-readable reasons, component scores, contract flags, and warnings.",
+        },
+        {
+          title: "WebSocket completion updates",
+          detail: "A notification service pushes route completion and failure events to the frontend, with polling available as a fallback.",
+        },
+        {
+          title: "Privacy-safe analytics",
+          detail: "Product analytics avoid accounts and raw personal identity by hashing browser IDs server-side and bucketing start locations coarsely.",
         },
       ],
       impact: [
         {
-          title: "Production-shaped architecture",
-          detail: "Docker Compose, Caddy, Redis, Postgres, Kafka, OSRM, a route API, worker service, and WebSocket notifications run as a cohesive deployable system.",
+          title: "Production-style system depth",
+          detail: "Wayward demonstrates service boundaries, async messaging, geospatial persistence, caching, local routing, TLS proxying, and deploy automation in one cohesive product.",
         },
         {
-          title: "Clear scaling path",
-          detail: "The system can scale worker throughput, OSRM capacity, cache layers, and Postgres reads independently before needing heavier infrastructure.",
+          title: "Request path stays lean",
+          detail: "Runtime services score prepared feature vectors instead of recomputing land cover, elevation, water, buildings, parks, roads, and light-pollution signals per request.",
         },
+        {
+          title: "Honest unavailable behavior",
+          detail: "The latest documented route-quality rerun covered 27 scenarios with 19 completed scenarios and 8 honest unavailable scenarios where weak vibe matches were rejected.",
+        },
+        {
+          title: "Scenic-data upgrades proved useful",
+          detail: "A v3.5-to-v3.7 comparison found 57 comparable completed route options, 16 geometry changes of at least 0.2 km, and 35 final-score changes of at least 0.005.",
+        },
+        {
+          title: "Operational release path",
+          detail: "GitHub Actions, GHCR images, health checks, rollback scripts, versioned scenic data, versioned OSRM data, and Caddy TLS make the project deployable rather than just demonstrable.",
+        },
+      ],
+      resumeBullets: [
+        "Built Wayward, a full-stack scenic route-generation platform using Spring Boot, Kafka, PostGIS, Redis, OSRM, H3, Next.js, React, TypeScript, Mapbox GL, Docker Compose, Caddy, and GitHub Actions.",
+        "Designed an event-driven route pipeline where jobs are persisted, queued through Kafka, processed by workers, scored against H3 scenic tiles, and delivered through WebSocket notifications with polling fallback.",
+        "Implemented hybrid_osrm_v2, combining local OSRM /trip geometry with custom scenic/vibe scoring, route explanations, contract checks, and route profiles for most_scenic, balanced, and shorter options.",
+        "Built versioned scenic-data releases that precompute water, greenery, elevation, road stress, tree canopy, scenic POIs, viewpoints, urban pressure, and bridge/coastal signals into PostGIS-backed H3 tiles.",
+        "Added route-quality evaluation across 27 fixed scenarios to validate duration fit, score spread, geometry separation, explanations, unavailable behavior, and repeated-road risk.",
+        "Deployed a production-style multi-service stack behind Caddy TLS with GHCR image publishing, Docker Compose operations, release health checks, rollback scripts, Redis caching, Kafka messaging, and local OSRM routing.",
       ],
     },
     {

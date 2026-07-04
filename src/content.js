@@ -17,7 +17,7 @@ export const content = {
     contactHref: "https://www.linkedin.com/in/waally-xyz/",
     resume: "./public/assets/resume.pdf",
     intro:
-      "I'm Wale, a CS student at UNB. I love building and engineering backend/cloud systems: the distributed pieces, data flows, queues, APIs, and reliability work behind the products people depend on every day. Most of my projects start as personal itches: something I need, something that annoys me, or something I think should exist. Then they turn into backend-heavy products with real infrastructure behind them. But strong backend work does not excuse a rough product. Most users will never care how distributed the system is if the interface feels bad, so I try to make the UI/UX as intentional as the infrastructure underneath it: the doorway that lets all that backend work show up as something simple, useful, and worth using.",
+      "I'm Wale, a CS student at UNB. I love building and engineering backend/cloud systems: the distributed pieces, data flows, queues, APIs, and reliability work behind the products people depend on every day. Most of my projects start as personal itches: something I need, something that annoys me, or something I think should exist. Then they turn into backend-heavy products with real infrastructure behind them. I care just as much about the parts people actually touch. A polished interface is what lets the engineering underneath matter, so the skyscraper users see should feel as intentional as the foundation holding it up.",
     portrait: {
       src: "./public/assets/adebowale-portrait.jpg",
       alt: "Portrait of Adebowale Adebayo",

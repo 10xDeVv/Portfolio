@@ -17,7 +17,7 @@ export const content = {
     contactHref: "https://www.linkedin.com/in/waally-xyz/",
     resume: "./public/assets/resume.pdf",
     intro:
-      "I'm Adebowale, a CS student at UNB who likes building the parts of products people only notice when they break: auth, data models, queues, realtime updates, billing, privacy, and deployment details. Most of my projects start with a product itch, then turn into backend-heavy systems with clean APIs and enough operational discipline to actually run.",
+      "I'm Wale, a CS student at UNB. I love building and engineering backend/cloud systems: the distributed pieces, data flows, queues, APIs, and reliability work behind the products people depend on every day. Most of my projects start as personal itches: something I need, something that annoys me, or something I think should exist. Then they turn into backend-heavy products with real infrastructure behind them. I also care a lot about how people actually experience the thing. The skyscraper users see should feel sharp, simple, and polished, but it has to sit on systems solid enough to hold it up.",
     portrait: {
       src: "./public/assets/adebowale-portrait.jpg",
       alt: "Portrait of Adebowale Adebayo",

@@ -17,7 +17,7 @@ export const content = {
     contactHref: "https://www.linkedin.com/in/waally-xyz/",
     resume: "./public/assets/resume.pdf",
     intro:
-      "Hey, I'm Adebowale Adebayo, a Computer Science student at UNB building backend-heavy products with clean APIs, real-time systems, and production-minded infrastructure. I like working close to the core of products - auth, data models, queues, WebSockets, billing, privacy, and the reliability details that make software feel serious.",
+      "I'm Adebowale, a CS student at UNB who likes building the parts of products people only notice when they break: auth, data models, queues, realtime updates, billing, privacy, and deployment details. Most of my projects start with a product itch, then turn into backend-heavy systems with clean APIs and enough operational discipline to actually run.",
     portrait: {
       src: "./public/assets/adebowale-portrait.jpg",
       alt: "Portrait of Adebowale Adebayo",

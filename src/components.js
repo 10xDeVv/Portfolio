@@ -217,6 +217,8 @@ function ProjectCard(project) {
 }
 
 function ProjectDetailPage(project) {
+  const detailLinks = project.links.filter((link) => link.href !== `#project/${project.slug}`);
+
   return `
     <div class="project-page">
       <main class="project-detail">
@@ -227,7 +229,7 @@ function ProjectDetailPage(project) {
             <h1>${project.title}</h1>
             <p>${project.headline}</p>
           </div>
-          ${renderLinks(project.links, "project-hero-links")}
+          ${renderLinks(detailLinks, "project-hero-links")}
         </section>
         <div class="project-tags detail-tags">
           ${project.tags.map((tag) => `<span>${tag}</span>`).join("")}
@@ -235,9 +237,7 @@ function ProjectDetailPage(project) {
         <div class="project-visual">
           <img src="${project.image}" alt="${project.title}" />
         </div>
-        ${ProjectTextSection("Overview", project.overview)}
-        ${ProjectTextSection("The Problem", project.problem)}
-        ${ProjectTextSection("The Solution", project.solution)}
+        ${ProjectStorySection(project)}
         ${ProjectMetricGrid(project.metrics)}
         ${ProjectSystemSection(project)}
         ${ProjectSimulationSection(project)}
@@ -249,11 +249,25 @@ function ProjectDetailPage(project) {
   `;
 }
 
-function ProjectTextSection(title, text) {
+function ProjectStorySection(project) {
+  const sections = [
+    ["Overview", project.overview],
+    ["The Problem", project.problem],
+    ["The Solution", project.solution],
+  ];
+
   return `
-    <section class="project-text-section">
-      <h2>${title}</h2>
-      <p>${text}</p>
+    <section class="project-story-section">
+      ${sections
+        .map(
+          ([title, text], index) => `
+            <details class="project-story-card" ${index === 0 ? "open" : "open"}>
+              <summary>${title}</summary>
+              <p>${text}</p>
+            </details>
+          `
+        )
+        .join("")}
     </section>
   `;
 }

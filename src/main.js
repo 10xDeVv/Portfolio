@@ -1,5 +1,5 @@
 import { content } from "./content.js?v=14";
-import { appTemplate } from "./components.js?v=25";
+import { appTemplate } from "./components.js?v=26";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -19,7 +19,8 @@ function render() {
   setupMenu();
   setupContactForm();
   setupSystemExplorer();
-  setupMermaidDiagrams();
+  setupMermaidDiagrams().then(setupDiagramPan);
+  setupResponsiveProjectDetails();
   restoreAnchorScroll();
 }
 
@@ -31,7 +32,7 @@ function setupReveal() {
       ".quote-card",
       ".contact-card",
       ".project-visual",
-      ".project-text-section",
+      ".project-story-card",
       ".project-detail-card",
       ".project-metric-card",
       ".project-system-section",
@@ -184,6 +185,60 @@ async function setupMermaidDiagrams() {
       diagram.classList.add("is-static");
     });
   }
+}
+
+function setupDiagramPan() {
+  document.querySelectorAll(".architecture-diagram").forEach((diagram) => {
+    let startX = 0;
+    let startY = 0;
+    let scrollLeft = 0;
+    let scrollTop = 0;
+    let isDragging = false;
+
+    diagram.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      isDragging = true;
+      diagram.classList.add("is-panning");
+      startX = event.clientX;
+      startY = event.clientY;
+      scrollLeft = diagram.scrollLeft;
+      scrollTop = diagram.scrollTop;
+      diagram.setPointerCapture(event.pointerId);
+    });
+
+    diagram.addEventListener("pointermove", (event) => {
+      if (!isDragging) return;
+      event.preventDefault();
+      diagram.scrollLeft = scrollLeft - (event.clientX - startX);
+      diagram.scrollTop = scrollTop - (event.clientY - startY);
+    });
+
+    const stopPan = (event) => {
+      if (!isDragging) return;
+      isDragging = false;
+      diagram.classList.remove("is-panning");
+      if (diagram.hasPointerCapture(event.pointerId)) diagram.releasePointerCapture(event.pointerId);
+    };
+
+    diagram.addEventListener("pointerup", stopPan);
+    diagram.addEventListener("pointercancel", stopPan);
+    diagram.addEventListener("pointerleave", stopPan);
+  });
+}
+
+function setupResponsiveProjectDetails() {
+  const apply = () => {
+    const compact = window.matchMedia("(max-width: 900px)").matches;
+    document.querySelectorAll(".project-story-card").forEach((card, index) => {
+      card.open = !compact || index === 0;
+    });
+    document.querySelectorAll(".decision-drawer").forEach((drawer) => {
+      if (compact) drawer.open = false;
+    });
+  };
+
+  apply();
+  window.addEventListener("resize", apply, { passive: true });
 }
 
 function closeMenu() {

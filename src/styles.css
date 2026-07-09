@@ -1027,11 +1027,42 @@ img {
   object-fit: cover;
 }
 
-.project-text-section {
+.project-story-section {
+  display: grid;
+  gap: 16px;
   margin-bottom: 76px;
 }
 
-.project-text-section h2,
+.project-story-card {
+  border: 1px solid transparent;
+  border-radius: 28px;
+}
+
+.project-story-card summary {
+  width: fit-content;
+  margin: 0 0 22px;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  list-style: none;
+}
+
+.project-story-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.project-story-card p {
+  max-width: 1120px;
+  margin: 0;
+  color: rgb(200, 200, 200);
+  font-family: var(--font-body);
+  font-size: clamp(20px, 2.2vw, 27px);
+  line-height: 1.55;
+}
+
 .project-detail-section h2 {
   margin: 0 0 28px;
   color: var(--white);
@@ -1040,15 +1071,6 @@ img {
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.1;
-}
-
-.project-text-section p {
-  max-width: 1120px;
-  margin: 0;
-  color: rgb(200, 200, 200);
-  font-family: var(--font-body);
-  font-size: clamp(20px, 2.2vw, 27px);
-  line-height: 1.55;
 }
 
 .project-detail-section {
@@ -1302,58 +1324,79 @@ img {
 
 .system-panel p {
   margin: 24px 0 0;
-  color: rgb(205, 205, 205);
-  font-size: 20px;
-  line-height: 1.45;
 }
-
-.system-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
-}
-
-.system-stack span {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--white);
-  font-family: var(--font-heading);
-  font-size: 13px;
-  font-weight: 600;
-}
-
 .architecture-diagram {
-  overflow: hidden;
+  overflow: auto;
   margin-top: 18px;
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   background: var(--primary);
+  cursor: grab;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+
+.architecture-diagram::before {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(5, 5, 5, 0.82);
+  color: var(--muted);
+  content: "Drag / scroll to pan";
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.architecture-diagram.is-panning {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.architecture-diagram::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.architecture-diagram::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .architecture-diagram .mermaid {
   display: grid;
+  width: max-content;
+  min-width: 1180px;
   min-height: 420px;
   place-items: center;
   margin: 0;
   color: var(--white);
 }
 
+.lifecycle-diagram .mermaid {
+  min-width: 1320px;
+}
+
 .architecture-diagram svg {
-  max-width: 100%;
+  max-width: none;
   height: auto;
 }
 
 .architecture-diagram .mermaid svg {
-  width: 100% !important;
-  height: 430px !important;
+  width: 1180px !important;
+  height: auto !important;
 }
 
-.architecture-diagram .mermaid > svg {
-  transform: scale(1.28);
-  transform-origin: center;
+.lifecycle-diagram .mermaid svg {
+  width: 1320px !important;
 }
 
 .architecture-diagram .nodeLabel,
@@ -2169,6 +2212,27 @@ img {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+
+  .project-detail {
+    width: min(100%, calc(100vw - 48px));
+  }
+
+  .project-story-card p {
+    max-width: 100%;
+    font-size: 22px;
+  }
+
+  .proof-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .architecture-diagram .mermaid {
+    min-width: 1180px;
+  }
+
+  .lifecycle-diagram .mermaid {
+    min-width: 1320px;
+  }
   .more-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -2348,11 +2412,12 @@ img {
   }
 
   .project-hero-detail h1 {
-    font-size: clamp(54px, 18vw, 82px);
+    font-size: clamp(48px, 16vw, 76px);
   }
 
   .project-hero-detail p:last-child {
-    font-size: 22px;
+    font-size: 19px;
+    line-height: 1.45;
   }
 
   .visit-link {
@@ -2367,9 +2432,48 @@ img {
     margin-bottom: 52px;
   }
 
-  .project-text-section,
+  .project-story-section,
   .project-detail-section {
-    margin-bottom: 52px;
+    margin-bottom: 44px;
+  }
+
+  .project-story-section {
+    gap: 12px;
+  }
+
+  .project-story-card {
+    padding: 20px;
+    border-color: var(--border);
+    background: var(--primary);
+  }
+
+  .project-story-card summary {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .project-story-card summary::after {
+    content: "+";
+    color: var(--muted);
+    font-size: 24px;
+  }
+
+  .project-story-card[open] summary {
+    margin-bottom: 16px;
+  }
+
+  .project-story-card[open] summary::after {
+    content: "–";
+  }
+
+  .project-story-card p {
+    font-size: 17px;
+    line-height: 1.55;
   }
 
   .project-detail-grid {
@@ -2379,6 +2483,19 @@ img {
 
   .project-metrics-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .project-metric-card {
+    min-height: 118px;
+    padding: 20px;
+  }
+
+  .project-metric-card strong {
+    font-size: 36px;
+  }
+
+  .project-metric-card span {
+    font-size: 13px;
   }
 
   .system-explorer,
@@ -2396,17 +2513,43 @@ img {
   }
 
   .system-node {
-    min-height: 96px;
+    min-height: 72px;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .system-node strong {
+    font-size: 20px;
+  }
+
+  .system-node em {
+    margin-top: 4px;
+    font-size: 15px;
   }
 
   .architecture-diagram {
-    padding: 14px;
+    max-width: calc(100vw - 32px);
+    padding: 10px;
+    scroll-snap-type: both proximity;
   }
 
   .architecture-diagram .mermaid {
-    min-height: 280px;
-    overflow-x: auto;
-    place-items: start;
+    min-width: 980px;
+    min-height: 340px;
+    place-items: center;
+  }
+
+  .architecture-diagram .mermaid svg {
+    width: 980px !important;
+  }
+
+  .lifecycle-diagram .mermaid {
+    min-width: 1120px;
+  }
+
+  .lifecycle-diagram .mermaid svg {
+    width: 1120px !important;
   }
 
 
@@ -2417,8 +2560,8 @@ img {
     padding: 24px;
   }
 
-  .project-text-section p {
-    font-size: 20px;
+  .decision-heading p {
+    font-size: 17px;
   }
 
   .project-bullet-list li {

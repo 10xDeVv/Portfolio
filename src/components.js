@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=10";
+import { content } from "./content.js?v=14";
 
 const {
   contact,
@@ -242,10 +242,7 @@ function ProjectDetailPage(project) {
         ${ProjectSystemSection(project)}
         ${ProjectSimulationSection(project)}
         ${ProjectDecisionSection(project)}
-        ${ProjectCardGrid("Architecture Highlights", project.architecture)}
-        ${ProjectCardGrid("What Makes It Different", project.differentiators)}
-        ${ProjectCardGrid("Key Features", project.features)}
-        ${ProjectCardGrid("Results & Impact", project.impact)}
+        ${ProjectProofBoard(project)}
         ${ProjectBulletSection("Technical Contributions", project.resumeBullets)}
       </main>
     </div>
@@ -283,17 +280,27 @@ function ProjectCardGrid(title, items) {
   `;
 }
 
+function ProjectArchitectureMap(project) {
+  if (!project.mermaidDiagram) return "";
+
+  return `
+    <div class="architecture-diagram" aria-label="${project.title} architecture diagram">
+      <pre class="mermaid">${project.mermaidDiagram}</pre>
+    </div>
+  `;
+}
+
 function ProjectSystemSection(project) {
   if (!project.systemFlow?.length) return "";
 
   const active = project.systemFlow[0];
-  const flowLabels = project.systemDiagram || ["Frontend request", "Kafka job", "Worker + OSRM", "Scenic scoring", "WebSocket result"];
+  const architectureMap = ProjectArchitectureMap(project);
 
   return `
     <section class="project-detail-section project-system-section">
       <div class="project-section-heading">
         <p class="project-eyebrow">${project.systemEyebrow || "Interactive architecture"}</p>
-        <h2>${project.systemTitle || `How ${project.title} generates a scenic route`}</h2>
+        <h2>${project.systemTitle || `How ${project.title} works under load`}</h2>
       </div>
       <div class="system-explorer" data-system-explorer>
         <div class="system-flow" aria-label="${project.title} system flow">
@@ -320,12 +327,12 @@ function ProjectSystemSection(project) {
           </div>
         </article>
       </div>
-      <div class="system-diagram" aria-label="${project.title} data flow">
-        ${flowLabels.map((label) => `<div>${label}</div>`).join("<span>→</span>")}
-      </div>
+      ${architectureMap}
+      ${project.architectureNote ? `<p class="architecture-note">${project.architectureNote}</p>` : ""}
     </section>
   `;
 }
+
 
 function ProjectSimulationSection(project) {
   if (!project.routeSimulation?.length) return "";
@@ -333,34 +340,31 @@ function ProjectSimulationSection(project) {
   return `
     <section class="project-detail-section route-simulation-section">
       <div class="project-section-heading">
-        <p class="project-eyebrow">${project.simulationEyebrow || "Functional animation"}</p>
-        <h2>${project.simulationTitle || "Route generation simulation"}</h2>
+        <p class="project-eyebrow">${project.simulationEyebrow || "Execution trace"}</p>
+        <h2>${project.simulationTitle || "What happens after the request starts"}</h2>
       </div>
-      <div class="route-simulation" data-route-simulation>
-        <div class="simulation-map" aria-hidden="true">
-          <div class="sim-grid"></div>
-          <span class="sim-point sim-start"></span>
-          <span class="sim-point sim-anchor sim-anchor-one"></span>
-          <span class="sim-point sim-anchor sim-anchor-two"></span>
-          <span class="sim-point sim-anchor sim-anchor-three"></span>
-          <svg class="sim-route" viewBox="0 0 600 360" preserveAspectRatio="none">
-            <path class="sim-route-ghost" d="M132 216 C172 92 282 64 376 112 C508 180 486 302 352 310 C224 318 90 288 132 216" />
-            <path class="sim-route-line" d="M132 216 C172 92 282 64 376 112 C508 180 486 302 352 310 C224 318 90 288 132 216" />
-          </svg>
-          <div class="sim-result-card">
-            <strong>${project.simulationResult?.title || "most_scenic"}</strong>
-            <span>${project.simulationResult?.detail || "92 scenic match"}</span>
-          </div>
-        </div>
+      ${
+        project.lifecycleDiagram
+          ? `<div class="architecture-diagram lifecycle-diagram" aria-label="${project.title} lifecycle diagram">
+              <pre class="mermaid">${project.lifecycleDiagram}</pre>
+            </div>`
+          : ""
+      }
+      <div class="route-simulation trace-layout" data-route-simulation>
         <div class="simulation-console">
           <div class="console-header">
             <span></span><span></span><span></span>
-            <strong>${project.simulationLogTitle || "route-worker.log"}</strong>
+            <strong>${project.simulationLogTitle || "pipeline.log"}</strong>
           </div>
           <ol class="simulation-steps">
             ${project.routeSimulation.map((step, index) => `<li style="--step-index:${index}">${step}</li>`).join("")}
           </ol>
         </div>
+        <aside class="trace-summary">
+          <p class="project-eyebrow">End state</p>
+          <strong>${project.simulationResult?.title || "request_complete"}</strong>
+          <span>${project.simulationResult?.detail || "state persisted and users notified"}</span>
+        </aside>
       </div>
     </section>
   `;
@@ -371,20 +375,26 @@ function ProjectDecisionSection(project) {
 
   return `
     <section class="project-detail-section decision-section">
-      <div class="project-section-heading">
-        <p class="project-eyebrow">Engineering judgment</p>
-        <h2>Decisions and failure modes</h2>
+      <div class="project-section-heading decision-heading">
+        <p class="project-eyebrow">Tradeoff notes</p>
+        <h2>Decisions, tradeoffs, and stress cases</h2>
+        <p>Skimmable by default. Open a decision when you want the reasoning behind the build.</p>
       </div>
       <div class="decision-layout">
-        <div class="decision-grid">
+        <div class="decision-drawers">
           ${(project.engineeringDecisions || [])
             .map(
-              (item) => `
-                <article class="decision-card">
-                  <h3>${item.title}</h3>
-                  <p><strong>Why:</strong> ${item.why}</p>
-                  <p><strong>Tradeoff:</strong> ${item.tradeoff}</p>
-                </article>
+              (item, index) => `
+                <details class="decision-drawer"${index === 0 ? " open" : ""}>
+                  <summary>
+                    <span>${String(index + 1).padStart(2, "0")}</span>
+                    <strong>${item.title}</strong>
+                  </summary>
+                  <div>
+                    <p><b>Why</b>${item.why}</p>
+                    <p><b>Tradeoff</b>${item.tradeoff}</p>
+                  </div>
+                </details>
               `
             )
             .join("")}
@@ -392,11 +402,58 @@ function ProjectDecisionSection(project) {
         ${
           project.failureModes?.length
             ? `<aside class="failure-card">
-                <h3>Failure modes handled</h3>
+                <p class="project-eyebrow">Handled failure modes</p>
+                <h3>Stress-test checklist</h3>
                 <ul>${project.failureModes.map((item) => `<li>${item}</li>`).join("")}</ul>
               </aside>`
             : ""
         }
+      </div>
+    </section>
+  `;
+}
+
+function ProjectProofBoard(project) {
+  const sections = [
+    ["Architecture", project.architecture],
+    ["Differentiators", project.differentiators],
+    ["Features", project.features],
+    ["Impact", project.impact],
+  ].filter(([, items]) => items?.length);
+
+  if (!sections.length) return "";
+
+  return `
+    <section class="project-detail-section proof-board-section">
+      <div class="project-section-heading">
+        <p class="project-eyebrow">Proof board</p>
+        <h2>What to remember without reading every card</h2>
+      </div>
+      <div class="proof-board">
+        ${sections
+          .map(
+            ([title, items]) => `
+              <article class="proof-column">
+                <header>
+                  <span>${String(items.length).padStart(2, "0")}</span>
+                  <h3>${title}</h3>
+                </header>
+                <div>
+                  ${items
+                    .map(
+                      (item) => `
+                        <details class="proof-note">
+                          <summary>${item.title}</summary>
+                          <p>${item.detail}</p>
+                        </details>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </article>
+            `
+          )
+          .join("")}
       </div>
     </section>
   `;

@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=10";
-import { appTemplate } from "./components.js?v=21";
+import { content } from "./content.js?v=14";
+import { appTemplate } from "./components.js?v=25";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -19,6 +19,7 @@ function render() {
   setupMenu();
   setupContactForm();
   setupSystemExplorer();
+  setupMermaidDiagrams();
   restoreAnchorScroll();
 }
 
@@ -35,8 +36,10 @@ function setupReveal() {
       ".project-metric-card",
       ".project-system-section",
       ".route-simulation-section",
-      ".decision-card",
+      ".decision-drawer",
       ".failure-card",
+      ".proof-column",
+      ".project-bullet-list li",
     ].join(", ")
   );
 
@@ -150,6 +153,37 @@ function setupSystemExplorer() {
     node.addEventListener("click", () => renderStep(index));
     node.addEventListener("mouseenter", () => renderStep(index));
   });
+}
+
+async function setupMermaidDiagrams() {
+  const diagrams = [...document.querySelectorAll(".mermaid")];
+  if (!diagrams.length) return;
+
+  try {
+    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "dark",
+      themeVariables: {
+        background: "#0a0a0a",
+        mainBkg: "#121212",
+        primaryColor: "#121212",
+        primaryTextColor: "#ffffff",
+        primaryBorderColor: "#343434",
+        lineColor: "#8f8f8f",
+        edgeLabelBackground: "#050505",
+        fontFamily: "Instrument Sans, Inter, system-ui, sans-serif",
+      },
+    });
+
+    await mermaid.run({ nodes: diagrams });
+  } catch (error) {
+    document.querySelectorAll(".architecture-diagram").forEach((diagram) => {
+      diagram.classList.add("is-static");
+    });
+  }
 }
 
 function closeMenu() {

@@ -129,6 +129,31 @@ export const content = {
         { value: "14,092", label: "non-zero viewpoint tiles" },
         { value: "6,480", label: "non-zero bridge/coastal tiles" },
       ],
+      mermaidDiagram: `
+flowchart LR
+  Client[Next.js + Mapbox<br/>Route request]
+  API[Spring Boot<br/>route-api]
+  DB[(PostgreSQL + PostGIS<br/>route_jobs, scenic tiles)]
+  Redis[(Redis<br/>caches)]
+  Kafka[Kafka<br/>job events]
+  Worker[Java worker<br/>route-worker]
+  OSRM[Local OSRM<br/>/trip]
+  Notify[Notification service<br/>WebSockets]
+
+  Client -->|POST /routes| API
+  API -->|persist job| DB
+  API -->|publish job event| Kafka
+  Kafka -->|consume| Worker
+  Worker -->|read scenic tiles| DB
+  Worker -->|cache lookup| Redis
+  Worker -->|candidate waypoints + /trip| OSRM
+  OSRM -->|legal road geometry| Worker
+  Worker -->|score + dedupe| Worker
+  Worker -->|persist options| DB
+  Worker -->|completion event| Kafka
+  Kafka -->|push via WS| Notify
+  Notify -->|WebSocket / polling| Client
+      `,
       systemFlow: [
         {
           title: "Route request",
@@ -179,6 +204,40 @@ export const content = {
           stack: ["WebSockets", "Kafka events", "polling"],
         },
       ],
+      simulationEyebrow: "Route pipeline",
+      simulationTitle: "Route worker execution trace",
+      simulationLogTitle: "route-worker.log",
+      simulationResult: {
+        title: "Three route options ready",
+        detail: "Most scenic, balanced, and shorter profiles are persisted and delivered to the UI.",
+      },
+      lifecycleDiagram: `
+sequenceDiagram
+  participant C as Client (Next.js)
+  participant A as route-api
+  participant K as Kafka
+  participant W as route-worker
+  participant O as OSRM
+  participant D as PostGIS/Redis
+  participant N as Notification service
+
+  C->>A: POST /routes {time, vibe, location}
+  A->>D: INSERT route_jobs (pending)
+  A->>K: publish route_job.created
+  A-->>C: 202 Accepted {job_id}
+
+  K->>W: consume route_job.created
+  W->>D: load scenic H3 tiles + caches
+  W->>W: generate waypoint candidates
+  W->>O: /trip with candidates
+  O-->>W: legal loop geometry
+  W->>W: score geometry vs scenic tiles
+  W->>W: apply vibe contracts, dedupe
+  W->>D: persist route_options + explanations
+  W->>K: publish route_job.completed/failed
+  K->>N: forward completion event
+  N->>C: WebSocket push (or polling fallback)
+      `,
       routeSimulation: [
         "Persist route job",
         "Publish Kafka event",
@@ -361,7 +420,31 @@ export const content = {
       ],
       systemEyebrow: "Realtime transfer architecture",
       systemTitle: "How LazyDrop moves files without routing bytes through the API",
-      systemDiagram: ["Session code", "Signed upload URL", "Object storage", "Metadata confirm", "WebSocket event"],
+      mermaidDiagram: `
+flowchart LR
+  Browser[Next.js<br/>drop room UI]
+  Auth[Supabase Auth<br/>JWT + guest cookie]
+  API[Spring Boot<br/>session/file API]
+  DB[(PostgreSQL<br/>sessions, participants, files)]
+  Spaces[(DigitalOcean Spaces<br/>file bytes)]
+  Topic[STOMP topic<br/>session events]
+  Stripe[Stripe<br/>checkout + webhooks]
+  Jobs[Schedulers + LazyQueue<br/>cleanup + retries]
+
+  Browser -->|join/create session| API
+  Auth -->|identity context| API
+  API -->|enforce plan + access| DB
+  API -->|signed upload URL| Browser
+  Browser -->|direct upload bytes| Spaces
+  Browser -->|confirm upload| API
+  API -->|persist metadata only| DB
+  API -->|broadcast typed event| Topic
+  Topic -->|live file state| Browser
+  API -->|signed download URL| Browser
+  Stripe -->|idempotent webhook| API
+  Jobs -->|expire sessions| DB
+  Jobs -->|delete expired objects| Spaces
+      `,
       systemFlow: [
         {
           title: "Create drop room",
@@ -415,7 +498,29 @@ export const content = {
       simulationEyebrow: "Transfer lifecycle",
       simulationTitle: "Signed upload and realtime delivery flow",
       simulationLogTitle: "drop-session.log",
-      simulationResult: { title: "file_ready", detail: "metadata confirmed + peers notified" },
+      simulationResult: { title: "File available to participants", detail: "Metadata is confirmed, peers are notified, and downloads use signed URLs." },
+      lifecycleDiagram: `
+sequenceDiagram
+  participant B as Browser
+  participant A as Spring Boot API
+  participant S as DigitalOcean Spaces
+  participant D as PostgreSQL
+  participant T as STOMP topic
+  participant P as Peer browser
+
+  B->>A: POST /files/upload-url {session, file}
+  A->>D: validate session, role, plan limits
+  A-->>B: signed PUT URL + storage key
+  B->>S: PUT file bytes directly
+  S-->>B: 200 upload complete
+  B->>A: POST /files/confirm {storage key}
+  A->>D: INSERT file metadata
+  A->>T: publish file.uploaded
+  T-->>P: realtime file event
+  P->>A: GET signed download URL
+  A-->>P: short-lived download URL
+  P->>S: download file directly
+      `,
       routeSimulation: [
         "Create temporary drop session",
         "Participant joins by QR link or session code",
@@ -594,7 +699,26 @@ export const content = {
       ],
       systemEyebrow: "Privacy-first AI pipeline",
       systemTitle: "How WhereDidIApply turns Gmail into a local job-search dashboard",
-      systemDiagram: ["Browser Gmail scan", "Rules prefilter", "Stateless API", "Gemini fallback", "Local dashboard"],
+      mermaidDiagram: `
+flowchart LR
+  Browser[Next.js<br/>Browser-held Gmail token]
+  Gmail[Gmail API<br/>read-only]
+  API[Spring Boot<br/>stateless classifier]
+  Rules[Rules engine<br/>regex + marketing filters]
+  LLM[Gemini 2.0 Flash<br/>schema fallback]
+  Local[(localStorage<br/>application dashboard)]
+
+  Browser -->|OAuth read-only| Gmail
+  Browser -->|subject/body snippets only| API
+  API -->|prefilter| Rules
+  Rules -->|high confidence| API
+  Rules -->|ambiguous| LLM
+  LLM -->|structured JSON| API
+  API -->|classified records| Browser
+  Browser -->|cache + edit| Local
+      `,
+      architectureNote:
+        "No arrow from the browser to the backend carries Gmail OAuth tokens. The backend receives only email text snippets for in-memory classification.",
       systemFlow: [
         {
           title: "Authorize Gmail",
@@ -648,7 +772,34 @@ export const content = {
       simulationEyebrow: "Scan lifecycle",
       simulationTitle: "Rules-first Gmail classification flow",
       simulationLogTitle: "gmail-scan.log",
-      simulationResult: { title: "dashboard_ready", detail: "deduped applications cached locally" },
+      simulationResult: { title: "Dashboard ready locally", detail: "Applications are deduped, prioritized, editable, and cached in the browser." },
+      lifecycleDiagram: `
+sequenceDiagram
+  participant B as Browser
+  participant G as Gmail API
+  participant A as Spring Boot API
+  participant R as Rules engine
+  participant L as Gemini
+  participant S as localStorage
+
+  B->>G: Gmail read-only search query
+  G-->>B: candidate messages
+  B->>A: start scan run
+  A-->>B: HMAC run token + quotas
+  loop batched parse requests
+    B->>A: subject, sender, body text
+    A->>R: marketing filter + regex classification
+    alt high-confidence rules match
+      R-->>A: structured record
+    else ambiguous email
+      A->>L: schema-constrained classification
+      L-->>A: structured JSON
+    end
+    A-->>B: classified application record
+  end
+  B->>B: merge + dedupe by company and role
+  B->>S: cache editable dashboard + CSV-ready rows
+      `,
       routeSimulation: [
         "Authorize Gmail read-only access",
         "Search targeted job-related emails",

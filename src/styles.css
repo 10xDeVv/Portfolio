@@ -1117,33 +1117,45 @@ img {
 
 .project-bullet-list {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
+  counter-reset: contribution;
 }
 
 .project-bullet-list li {
   position: relative;
-  padding: 18px 22px 18px 48px;
+  min-height: 104px;
+  padding: 18px 20px 18px 64px;
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--primary);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 42%),
+    var(--primary);
   color: rgb(210, 210, 210);
   font-family: var(--font-body);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.45;
+  counter-increment: contribution;
 }
 
 .project-bullet-list li::before {
   position: absolute;
-  top: 24px;
-  left: 22px;
-  width: 8px;
-  height: 8px;
-  content: "";
+  top: 18px;
+  left: 18px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  content: counter(contribution, decimal-leading-zero);
+  border: 1px solid var(--border);
   border-radius: 50%;
-  background: var(--green);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .project-section-heading {
@@ -1254,9 +1266,7 @@ img {
 
 .system-panel,
 .failure-card,
-.decision-card,
-.simulation-console,
-.simulation-map {
+.simulation-console {
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   background: var(--primary);
@@ -1314,146 +1324,138 @@ img {
   font-weight: 600;
 }
 
-.system-diagram {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-  align-items: center;
+.architecture-diagram {
+  overflow: hidden;
   margin-top: 18px;
-  color: var(--muted);
-}
-
-.system-diagram div {
-  min-height: 70px;
-  display: grid;
-  place-items: center;
-  padding: 14px;
+  padding: 22px;
   border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--secondary);
-  color: var(--white);
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
+  border-radius: var(--radius-card);
+  background: var(--primary);
 }
 
-.system-diagram span {
-  display: none;
+.architecture-diagram .mermaid {
+  display: grid;
+  min-height: 420px;
+  place-items: center;
+  margin: 0;
+  color: var(--white);
+}
+
+.architecture-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.architecture-diagram .mermaid svg {
+  width: 100% !important;
+  height: 430px !important;
+}
+
+.architecture-diagram .mermaid > svg {
+  transform: scale(1.28);
+  transform-origin: center;
+}
+
+.architecture-diagram .nodeLabel,
+.architecture-diagram .nodeLabel p,
+.architecture-diagram .edgeLabel,
+.architecture-diagram .edgeLabel p {
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+}
+
+.architecture-diagram .node rect,
+.architecture-diagram .node polygon,
+.architecture-diagram .node circle,
+.architecture-diagram .node ellipse {
+  fill: var(--secondary) !important;
+  stroke: rgba(255, 255, 255, 0.24) !important;
+}
+
+.architecture-diagram .edgePath path {
+  stroke: rgb(175, 175, 175) !important;
+  stroke-width: 1.8px !important;
+}
+
+.architecture-diagram .edgeLabel,
+.architecture-diagram .edgeLabel p {
+  color: var(--white) !important;
+  background: var(--background) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.architecture-diagram.is-static .mermaid {
+  place-items: start;
+  overflow-x: auto;
+  padding: 18px;
+  border-radius: var(--radius-card);
+  background: var(--secondary);
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.lifecycle-diagram {
+  margin-bottom: var(--gap);
+}
+
+.lifecycle-diagram .mermaid {
+  min-height: 520px;
+}
+
+.architecture-note {
+  max-width: 820px;
+  margin: 18px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--primary);
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 .route-simulation {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.38fr);
   gap: var(--gap);
 }
 
-.simulation-map {
-  position: relative;
-  min-height: 430px;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 20% 24%, rgba(255, 255, 255, 0.16), transparent 4%),
-    radial-gradient(circle at 72% 32%, rgba(255, 255, 255, 0.12), transparent 5%),
-    radial-gradient(circle at 58% 82%, rgba(255, 255, 255, 0.1), transparent 5%),
-    linear-gradient(135deg, rgba(80, 30, 130, 0.18), transparent 42%),
-    rgb(8, 8, 8);
+.trace-layout .simulation-console,
+.trace-summary {
+  min-height: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--primary);
 }
 
-.sim-grid {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 54px 54px;
-  opacity: 0.38;
-}
-
-.sim-route {
-  position: absolute;
-  inset: 9% 7%;
-  width: 86%;
-  height: 82%;
-}
-
-.sim-route path {
-  fill: none;
-  stroke-linecap: round;
-}
-
-.sim-route-ghost {
-  stroke: rgba(255, 255, 255, 0.14);
-  stroke-width: 22;
-}
-
-.sim-route-line {
-  stroke: var(--white);
-  stroke-width: 6;
-  stroke-dasharray: 900;
-  stroke-dashoffset: 900;
-  animation: drawRoute 5.8s ease-in-out infinite;
-}
-
-.sim-point {
-  position: absolute;
-  z-index: 2;
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--background);
-  border-radius: 50%;
-  background: var(--white);
-  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.12);
-}
-
-.sim-start {
-  left: 21%;
-  top: 58%;
-  animation: pointPulse 2.2s ease-in-out infinite;
-}
-
-.sim-anchor-one {
-  left: 39%;
-  top: 22%;
-  animation: pointPulse 2.2s ease-in-out infinite 0.35s;
-}
-
-.sim-anchor-two {
-  right: 21%;
-  top: 35%;
-  animation: pointPulse 2.2s ease-in-out infinite 0.7s;
-}
-
-.sim-anchor-three {
-  right: 34%;
-  bottom: 18%;
-  animation: pointPulse 2.2s ease-in-out infinite 1.05s;
-}
-
-.sim-result-card {
-  position: absolute;
-  right: 26px;
-  bottom: 26px;
-  z-index: 3;
+.trace-summary {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 18px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(16px);
+  justify-content: center;
+  min-height: 260px;
+  padding: 32px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 48%),
+    var(--primary);
 }
 
-.sim-result-card strong {
+.trace-summary strong {
   color: var(--white);
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: clamp(30px, 3vw, 42px);
+  line-height: 1;
 }
 
-.sim-result-card span {
+.trace-summary span {
+  margin-top: 16px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 17px;
+  line-height: 1.4;
 }
 
 .simulation-console {
@@ -1516,60 +1518,182 @@ img {
   background: var(--muted);
 }
 
-.decision-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
-  gap: var(--gap);
-}
-
-.decision-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--gap);
-}
-
-.decision-card,
-.failure-card {
-  padding: 28px;
-}
-
-.decision-card p,
-.failure-card li {
+.decision-heading p {
+  max-width: 620px;
+  margin: 18px 0 0;
   color: var(--muted);
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.45;
 }
 
-.decision-card p {
-  margin: 20px 0 0;
+.decision-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.45fr);
+  gap: var(--gap);
 }
 
-.decision-card strong {
+.decision-drawers {
+  display: grid;
+  gap: 12px;
+}
+
+.decision-drawer,
+.failure-card,
+.proof-column,
+.proof-note {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--primary);
+}
+
+.decision-drawer {
+  overflow: hidden;
+}
+
+.decision-drawer summary {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 22px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.decision-drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.decision-drawer summary span {
+  color: var(--muted);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.decision-drawer summary strong,
+.failure-card h3 {
+  margin: 0;
   color: var(--white);
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.decision-drawer > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  padding: 0 12px 12px;
+}
+
+.decision-drawer p {
+  min-height: 132px;
+  margin: 0;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--secondary);
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.decision-drawer b {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.failure-card {
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 48%),
+    var(--primary);
 }
 
 .failure-card ul {
-  display: grid;
-  gap: 14px;
-  margin: 26px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 0;
   padding: 0;
   list-style: none;
 }
 
 .failure-card li {
-  position: relative;
-  padding-left: 22px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: rgb(205, 205, 205);
+  font-size: 13px;
+  line-height: 1.2;
 }
 
-.failure-card li::before {
-  position: absolute;
-  left: 0;
-  top: 9px;
-  width: 7px;
-  height: 7px;
-  content: "";
-  border-radius: 50%;
-  background: var(--white);
+.proof-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.proof-column {
+  overflow: hidden;
+}
+
+.proof-column header {
+  display: block;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.proof-column header span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.proof-column h3 {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: clamp(21px, 1.7vw, 27px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.proof-column > div {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.proof-note {
+  background: var(--secondary);
+}
+
+.proof-note summary {
+  padding: 14px;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.15;
+  cursor: pointer;
+}
+
+.proof-note p {
+  margin: 0;
+  padding: 0 14px 16px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 @keyframes drawRoute {
@@ -2260,7 +2384,9 @@ img {
   .system-explorer,
   .route-simulation,
   .decision-layout,
-  .decision-grid {
+  .decision-drawer > div,
+  .proof-board,
+  .project-bullet-list {
     grid-template-columns: 1fr;
   }
 
@@ -2273,17 +2399,21 @@ img {
     min-height: 96px;
   }
 
-  .system-diagram {
-    grid-template-columns: 1fr;
+  .architecture-diagram {
+    padding: 14px;
   }
 
-  .simulation-map {
-    min-height: 320px;
+  .architecture-diagram .mermaid {
+    min-height: 280px;
+    overflow-x: auto;
+    place-items: start;
   }
+
+
 
   .system-panel,
-  .decision-card,
-  .failure-card {
+  .failure-card,
+  .decision-drawer summary {
     padding: 24px;
   }
 
@@ -2292,13 +2422,13 @@ img {
   }
 
   .project-bullet-list li {
-    padding: 16px 18px 16px 40px;
-    font-size: 16px;
+    min-height: 0;
+    padding: 16px 18px 16px 58px;
   }
 
   .project-bullet-list li::before {
-    top: 22px;
-    left: 18px;
+    top: 16px;
+    left: 16px;
   }
 
   .toolbox-card {

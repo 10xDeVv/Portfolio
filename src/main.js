@@ -1,5 +1,5 @@
 import { content } from "./content.js?v=14";
-import { appTemplate } from "./components.js?v=26";
+import { appTemplate } from "./components.js?v=27";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -189,14 +189,54 @@ async function setupMermaidDiagrams() {
 
 function setupDiagramPan() {
   document.querySelectorAll(".architecture-diagram").forEach((diagram) => {
+    const svg = diagram.querySelector("svg");
+    const resetButton = diagram.querySelector('[data-diagram-zoom="reset"]');
+    const baseWidth = diagram.classList.contains("lifecycle-diagram") ? 1320 : 1180;
+    let zoom = 1;
     let startX = 0;
     let startY = 0;
     let scrollLeft = 0;
     let scrollTop = 0;
     let isDragging = false;
 
+    const applyZoom = (nextZoom) => {
+      if (!svg) return;
+      const centerX = (diagram.scrollLeft + diagram.clientWidth / 2) / Math.max(diagram.scrollWidth, 1);
+      const centerY = (diagram.scrollTop + diagram.clientHeight / 2) / Math.max(diagram.scrollHeight, 1);
+      zoom = Math.min(2.2, Math.max(0.65, nextZoom));
+      svg.style.setProperty("width", `${Math.round(baseWidth * zoom)}px`, "important");
+      svg.style.maxWidth = "none";
+      if (resetButton) resetButton.textContent = `${Math.round(zoom * 100)}%`;
+      requestAnimationFrame(() => {
+        diagram.scrollLeft = diagram.scrollWidth * centerX - diagram.clientWidth / 2;
+        diagram.scrollTop = diagram.scrollHeight * centerY - diagram.clientHeight / 2;
+      });
+    };
+
+    applyZoom(1);
+
+    diagram.querySelectorAll("[data-diagram-zoom]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const action = button.dataset.diagramZoom;
+        if (action === "in") applyZoom(zoom + 0.2);
+        if (action === "out") applyZoom(zoom - 0.2);
+        if (action === "reset") applyZoom(1);
+      });
+    });
+
+    diagram.addEventListener(
+      "wheel",
+      (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        applyZoom(zoom + (event.deltaY < 0 ? 0.12 : -0.12));
+      },
+      { passive: false }
+    );
+
     diagram.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0) return;
+      if (event.button !== 0 || event.target.closest(".diagram-controls")) return;
       isDragging = true;
       diagram.classList.add("is-panning");
       startX = event.clientX;

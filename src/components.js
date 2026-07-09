@@ -299,7 +299,18 @@ function ProjectArchitectureMap(project) {
 
   return `
     <div class="architecture-diagram" aria-label="${project.title} architecture diagram">
+      ${DiagramControls()}
       <pre class="mermaid">${project.mermaidDiagram}</pre>
+    </div>
+  `;
+}
+
+function DiagramControls() {
+  return `
+    <div class="diagram-controls" aria-label="Diagram zoom controls">
+      <button type="button" data-diagram-zoom="out" aria-label="Zoom diagram out">−</button>
+      <button type="button" data-diagram-zoom="reset" aria-label="Reset diagram zoom">100%</button>
+      <button type="button" data-diagram-zoom="in" aria-label="Zoom diagram in">+</button>
     </div>
   `;
 }
@@ -360,6 +371,7 @@ function ProjectSimulationSection(project) {
       ${
         project.lifecycleDiagram
           ? `<div class="architecture-diagram lifecycle-diagram" aria-label="${project.title} lifecycle diagram">
+              ${DiagramControls()}
               <pre class="mermaid">${project.lifecycleDiagram}</pre>
             </div>`
           : ""

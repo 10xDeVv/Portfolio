@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=8";
+import { content } from "./content.js?v=10";
 
 const {
   contact,
@@ -239,6 +239,9 @@ function ProjectDetailPage(project) {
         ${ProjectTextSection("The Problem", project.problem)}
         ${ProjectTextSection("The Solution", project.solution)}
         ${ProjectMetricGrid(project.metrics)}
+        ${ProjectSystemSection(project)}
+        ${ProjectSimulationSection(project)}
+        ${ProjectDecisionSection(project)}
         ${ProjectCardGrid("Architecture Highlights", project.architecture)}
         ${ProjectCardGrid("What Makes It Different", project.differentiators)}
         ${ProjectCardGrid("Key Features", project.features)}
@@ -275,6 +278,125 @@ function ProjectCardGrid(title, items) {
             `
           )
           .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function ProjectSystemSection(project) {
+  if (!project.systemFlow?.length) return "";
+
+  const active = project.systemFlow[0];
+  const flowLabels = project.systemDiagram || ["Frontend request", "Kafka job", "Worker + OSRM", "Scenic scoring", "WebSocket result"];
+
+  return `
+    <section class="project-detail-section project-system-section">
+      <div class="project-section-heading">
+        <p class="project-eyebrow">${project.systemEyebrow || "Interactive architecture"}</p>
+        <h2>${project.systemTitle || `How ${project.title} generates a scenic route`}</h2>
+      </div>
+      <div class="system-explorer" data-system-explorer>
+        <div class="system-flow" aria-label="${project.title} system flow">
+          ${project.systemFlow
+            .map(
+              (step, index) => `
+                <button class="system-node${index === 0 ? " is-active" : ""}" type="button" data-system-index="${index}">
+                  <span class="system-node-number">${String(index + 1).padStart(2, "0")}</span>
+                  <span>
+                    <strong>${step.title}</strong>
+                    <em>${step.eyebrow}</em>
+                  </span>
+                </button>
+              `
+            )
+            .join("")}
+        </div>
+        <article class="system-panel">
+          <p class="system-panel-eyebrow">${active.eyebrow}</p>
+          <h3>${active.title}</h3>
+          <p>${active.detail}</p>
+          <div class="system-stack">
+            ${active.stack.map((item) => `<span>${item}</span>`).join("")}
+          </div>
+        </article>
+      </div>
+      <div class="system-diagram" aria-label="${project.title} data flow">
+        ${flowLabels.map((label) => `<div>${label}</div>`).join("<span>→</span>")}
+      </div>
+    </section>
+  `;
+}
+
+function ProjectSimulationSection(project) {
+  if (!project.routeSimulation?.length) return "";
+
+  return `
+    <section class="project-detail-section route-simulation-section">
+      <div class="project-section-heading">
+        <p class="project-eyebrow">${project.simulationEyebrow || "Functional animation"}</p>
+        <h2>${project.simulationTitle || "Route generation simulation"}</h2>
+      </div>
+      <div class="route-simulation" data-route-simulation>
+        <div class="simulation-map" aria-hidden="true">
+          <div class="sim-grid"></div>
+          <span class="sim-point sim-start"></span>
+          <span class="sim-point sim-anchor sim-anchor-one"></span>
+          <span class="sim-point sim-anchor sim-anchor-two"></span>
+          <span class="sim-point sim-anchor sim-anchor-three"></span>
+          <svg class="sim-route" viewBox="0 0 600 360" preserveAspectRatio="none">
+            <path class="sim-route-ghost" d="M132 216 C172 92 282 64 376 112 C508 180 486 302 352 310 C224 318 90 288 132 216" />
+            <path class="sim-route-line" d="M132 216 C172 92 282 64 376 112 C508 180 486 302 352 310 C224 318 90 288 132 216" />
+          </svg>
+          <div class="sim-result-card">
+            <strong>${project.simulationResult?.title || "most_scenic"}</strong>
+            <span>${project.simulationResult?.detail || "92 scenic match"}</span>
+          </div>
+        </div>
+        <div class="simulation-console">
+          <div class="console-header">
+            <span></span><span></span><span></span>
+            <strong>${project.simulationLogTitle || "route-worker.log"}</strong>
+          </div>
+          <ol class="simulation-steps">
+            ${project.routeSimulation.map((step, index) => `<li style="--step-index:${index}">${step}</li>`).join("")}
+          </ol>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function ProjectDecisionSection(project) {
+  if (!project.engineeringDecisions?.length && !project.failureModes?.length) return "";
+
+  return `
+    <section class="project-detail-section decision-section">
+      <div class="project-section-heading">
+        <p class="project-eyebrow">Engineering judgment</p>
+        <h2>Decisions and failure modes</h2>
+      </div>
+      <div class="decision-layout">
+        <div class="decision-grid">
+          ${(project.engineeringDecisions || [])
+            .map(
+              (item) => `
+                <article class="decision-card">
+                  <h3>${item.title}</h3>
+                  <p><strong>Why:</strong> ${item.why}</p>
+                  <p><strong>Tradeoff:</strong> ${item.tradeoff}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+        ${
+          project.failureModes?.length
+            ? `<aside class="failure-card">
+                <h3>Failure modes handled</h3>
+                <ul>${project.failureModes.map((item) => `<li>${item}</li>`).join("")}</ul>
+              </aside>`
+            : ""
+        }
       </div>
     </section>
   `;

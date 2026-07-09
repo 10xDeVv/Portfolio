@@ -1146,6 +1146,470 @@ img {
   background: var(--green);
 }
 
+.project-section-heading {
+  max-width: 840px;
+  margin-bottom: 28px;
+}
+
+.project-section-heading h2 {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.system-explorer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: var(--gap);
+  align-items: stretch;
+}
+
+.system-flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    var(--primary);
+  background-size: 42px 42px;
+}
+
+.system-node {
+  position: relative;
+  min-height: 116px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--white);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    transform var(--transition);
+}
+
+.system-node::after {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  width: 42px;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, var(--muted), transparent);
+  opacity: 0.45;
+}
+
+.system-node:hover,
+.system-node.is-active {
+  border-color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.system-node.is-active::after {
+  background: linear-gradient(90deg, var(--white), rgba(255, 255, 255, 0));
+  opacity: 1;
+}
+
+.system-node-number {
+  color: var(--muted);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.system-node strong,
+.system-node em {
+  display: block;
+}
+
+.system-node strong {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.system-node em {
+  margin-top: 10px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-style: normal;
+  line-height: 1.2;
+}
+
+.system-panel,
+.failure-card,
+.decision-card,
+.simulation-console,
+.simulation-map {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--primary);
+}
+
+.system-panel {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 34px;
+}
+
+.system-panel-eyebrow {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.system-panel h3,
+.decision-card h3,
+.failure-card h3 {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.system-panel p {
+  margin: 24px 0 0;
+  color: rgb(205, 205, 205);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.system-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.system-stack span {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.system-diagram {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+  color: var(--muted);
+}
+
+.system-diagram div {
+  min-height: 70px;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--secondary);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.system-diagram span {
+  display: none;
+}
+
+.route-simulation {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: var(--gap);
+}
+
+.simulation-map {
+  position: relative;
+  min-height: 430px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 24%, rgba(255, 255, 255, 0.16), transparent 4%),
+    radial-gradient(circle at 72% 32%, rgba(255, 255, 255, 0.12), transparent 5%),
+    radial-gradient(circle at 58% 82%, rgba(255, 255, 255, 0.1), transparent 5%),
+    linear-gradient(135deg, rgba(80, 30, 130, 0.18), transparent 42%),
+    rgb(8, 8, 8);
+}
+
+.sim-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 54px 54px;
+  opacity: 0.38;
+}
+
+.sim-route {
+  position: absolute;
+  inset: 9% 7%;
+  width: 86%;
+  height: 82%;
+}
+
+.sim-route path {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.sim-route-ghost {
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 22;
+}
+
+.sim-route-line {
+  stroke: var(--white);
+  stroke-width: 6;
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: drawRoute 5.8s ease-in-out infinite;
+}
+
+.sim-point {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.12);
+}
+
+.sim-start {
+  left: 21%;
+  top: 58%;
+  animation: pointPulse 2.2s ease-in-out infinite;
+}
+
+.sim-anchor-one {
+  left: 39%;
+  top: 22%;
+  animation: pointPulse 2.2s ease-in-out infinite 0.35s;
+}
+
+.sim-anchor-two {
+  right: 21%;
+  top: 35%;
+  animation: pointPulse 2.2s ease-in-out infinite 0.7s;
+}
+
+.sim-anchor-three {
+  right: 34%;
+  bottom: 18%;
+  animation: pointPulse 2.2s ease-in-out infinite 1.05s;
+}
+
+.sim-result-card {
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(16px);
+}
+
+.sim-result-card strong {
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 18px;
+}
+
+.sim-result-card span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.simulation-console {
+  overflow: hidden;
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.console-header span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.7;
+}
+
+.console-header strong {
+  margin-left: 8px;
+  color: var(--muted);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.simulation-steps {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 16px 20px 20px;
+  list-style: none;
+}
+
+.simulation-steps li {
+  position: relative;
+  padding: 13px 0 13px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgb(206, 206, 206);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.25;
+  opacity: 0.42;
+  animation: consoleStep 5.8s linear infinite;
+  animation-delay: calc(var(--step-index) * 0.36s);
+}
+
+.simulation-steps li::before {
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 9px;
+  height: 9px;
+  content: "";
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.decision-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+  gap: var(--gap);
+}
+
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.decision-card,
+.failure-card {
+  padding: 28px;
+}
+
+.decision-card p,
+.failure-card li {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.decision-card p {
+  margin: 20px 0 0;
+}
+
+.decision-card strong {
+  color: var(--white);
+}
+
+.failure-card ul {
+  display: grid;
+  gap: 14px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.failure-card li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.failure-card li::before {
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 7px;
+  height: 7px;
+  content: "";
+  border-radius: 50%;
+  background: var(--white);
+}
+
+@keyframes drawRoute {
+  0%,
+  12% {
+    stroke-dashoffset: 900;
+  }
+  58%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pointPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.12);
+  }
+  50% {
+    transform: scale(1.22);
+    box-shadow: 0 0 0 16px rgba(255, 255, 255, 0.04);
+  }
+}
+
+@keyframes consoleStep {
+  0%,
+  18% {
+    opacity: 0.42;
+  }
+  22%,
+  52% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0.42;
+  }
+}
+
 .more-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1791,6 +2255,36 @@ img {
 
   .project-metrics-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .system-explorer,
+  .route-simulation,
+  .decision-layout,
+  .decision-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .system-flow {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .system-node {
+    min-height: 96px;
+  }
+
+  .system-diagram {
+    grid-template-columns: 1fr;
+  }
+
+  .simulation-map {
+    min-height: 320px;
+  }
+
+  .system-panel,
+  .decision-card,
+  .failure-card {
+    padding: 24px;
   }
 
   .project-text-section p {

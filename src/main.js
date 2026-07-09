@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=8";
-import { appTemplate } from "./components.js?v=19";
+import { content } from "./content.js?v=10";
+import { appTemplate } from "./components.js?v=21";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -18,6 +18,7 @@ function render() {
   setupElasticEffects();
   setupMenu();
   setupContactForm();
+  setupSystemExplorer();
   restoreAnchorScroll();
 }
 
@@ -31,6 +32,11 @@ function setupReveal() {
       ".project-visual",
       ".project-text-section",
       ".project-detail-card",
+      ".project-metric-card",
+      ".project-system-section",
+      ".route-simulation-section",
+      ".decision-card",
+      ".failure-card",
     ].join(", ")
   );
 
@@ -107,6 +113,42 @@ function setupContactForm() {
     );
 
     window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+  });
+}
+
+function setupSystemExplorer() {
+  const explorer = document.querySelector("[data-system-explorer]");
+  if (!explorer) return;
+
+  const slug = window.location.hash.match(/^#project\/([a-z0-9-]+)$/i)?.[1];
+  const project = content.projects.find((item) => item.slug === slug);
+  if (!project?.systemFlow?.length) return;
+
+  const nodes = [...explorer.querySelectorAll("[data-system-index]")];
+  const panel = explorer.querySelector(".system-panel");
+
+  const renderStep = (index) => {
+    const step = project.systemFlow[index];
+    if (!step || !panel) return;
+
+    nodes.forEach((node) => {
+      node.classList.toggle("is-active", Number(node.dataset.systemIndex) === index);
+    });
+
+    panel.innerHTML = `
+      <p class="system-panel-eyebrow">${step.eyebrow}</p>
+      <h3>${step.title}</h3>
+      <p>${step.detail}</p>
+      <div class="system-stack">
+        ${step.stack.map((item) => `<span>${item}</span>`).join("")}
+      </div>
+    `;
+  };
+
+  nodes.forEach((node) => {
+    const index = Number(node.dataset.systemIndex);
+    node.addEventListener("click", () => renderStep(index));
+    node.addEventListener("mouseenter", () => renderStep(index));
   });
 }
 

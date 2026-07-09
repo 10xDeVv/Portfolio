@@ -129,6 +129,96 @@ export const content = {
         { value: "14,092", label: "non-zero viewpoint tiles" },
         { value: "6,480", label: "non-zero bridge/coastal tiles" },
       ],
+      systemFlow: [
+        {
+          title: "Route request",
+          eyebrow: "Frontend",
+          detail: "The Next.js/Mapbox client sends a start point, time budget, and vibe request without waiting for route generation to finish.",
+          stack: ["Next.js", "Mapbox GL", "REST"],
+        },
+        {
+          title: "Job persisted",
+          eyebrow: "route-api",
+          detail: "Spring Boot stores the request as a durable route_jobs row so status, retries, and failures have a source of truth.",
+          stack: ["Spring Boot", "PostgreSQL", "Flyway"],
+        },
+        {
+          title: "Kafka dispatch",
+          eyebrow: "Queue",
+          detail: "The job ID is published to Kafka, decoupling the public API from expensive OSRM calls and scoring work.",
+          stack: ["Kafka", "Zookeeper", "events"],
+        },
+        {
+          title: "Worker planning",
+          eyebrow: "route-worker",
+          detail: "Workers load nearby scenic H3 tiles, road anchors, regional hints, and vibe-specific candidate strategies.",
+          stack: ["Java", "H3", "Redis", "PostGIS"],
+        },
+        {
+          title: "Legal road geometry",
+          eyebrow: "OSRM",
+          detail: "Candidate waypoint sets are sent to local OSRM /trip so every route follows real drivable roads.",
+          stack: ["OSRM", "OpenStreetMap", "/trip"],
+        },
+        {
+          title: "Scenic scoring",
+          eyebrow: "Scoring engine",
+          detail: "Returned corridors are sampled against scenic_score_tiles and scored for vibe fit, scenery, shape, duration, and backtracking risk.",
+          stack: ["H3 tiles", "vibe contracts", "QA baselines"],
+        },
+        {
+          title: "Route options",
+          eyebrow: "Results",
+          detail: "Wayward persists most_scenic, balanced, and shorter options with explanations and score breakdowns.",
+          stack: ["PostGIS", "Redis cache", "route options"],
+        },
+        {
+          title: "User notified",
+          eyebrow: "Realtime",
+          detail: "The notification service pushes completion or failure to the browser over WebSockets, with polling fallback.",
+          stack: ["WebSockets", "Kafka events", "polling"],
+        },
+      ],
+      routeSimulation: [
+        "Persist route job",
+        "Publish Kafka event",
+        "Load scenic H3 neighborhood",
+        "Generate waypoint candidates",
+        "Call local OSRM /trip",
+        "Sample geometry against scenic tiles",
+        "Apply vibe contracts and dedupe",
+        "Return three route profiles",
+      ],
+      engineeringDecisions: [
+        {
+          title: "Async jobs instead of blocking HTTP",
+          why: "Route generation can require multiple OSRM calls, scenic tile reads, candidate scoring passes, and failure handling. Keeping that inside one request would make the app fragile.",
+          tradeoff: "Adds Kafka and worker operations, but gives responsive UX, durable status, retries, and cleaner service boundaries.",
+        },
+        {
+          title: "Local OSRM instead of paid routing APIs",
+          why: "Wayward needs control over loop candidates, repeated route experiments, and legal road geometry without depending on per-request third-party costs.",
+          tradeoff: "Requires managing OSRM datasets and infrastructure, but keeps routing behavior predictable and owned.",
+        },
+        {
+          title: "Offline scenic releases instead of runtime enrichment",
+          why: "Computing water, greenery, elevation, road stress, tree canopy, POIs, and urban pressure during user requests would be too slow.",
+          tradeoff: "Data releases become a pipeline, but runtime scoring becomes fast lookup against versioned H3 feature vectors.",
+        },
+        {
+          title: "Vibe contracts instead of always returning a route",
+          why: "A mountain route in flat geography or a coastal route far inland should not be disguised as a good match.",
+          tradeoff: "Some requests honestly fail, but users get better trust and suggested alternatives instead of misleading output.",
+        },
+      ],
+      failureModes: [
+        "OSRM cannot produce a usable loop",
+        "Selected vibe is unavailable nearby",
+        "Candidate routes overlap or backtrack too much",
+        "Scenic signal is too weak for the requested promise",
+        "WebSocket delivery fails and polling must recover",
+        "Scenic tile cache misses fall back to PostGIS",
+      ],
       architecture: [
         {
           title: "Async route pipeline",
@@ -252,13 +342,13 @@ export const content = {
         { label: "Live Site", href: "https://lazydrop.app" },
         { label: "Case Study", href: "#project/lazydrop" },
       ],
-      tags: ["Next.js", "Spring Boot", "PostgreSQL", "WebSockets", "Stripe", "S3"],
+      tags: ["Next.js", "React", "Spring Boot", "PostgreSQL", "WebSockets", "Stripe", "S3"],
       overview:
-        "LazyDrop is a real-time, session-based file sharing platform. Users create temporary drop rooms, invite others through an 8-character code or QR link, and transfer files across devices with secure signed upload and download URLs. The product looks lightweight, but the backend handles authentication, guest access, WebSockets, object storage, Stripe subscriptions, plan enforcement, background cleanup, and CI/CD.",
+        "LazyDrop is a real-time, session-based file sharing SaaS. Users create temporary drop rooms, invite others through an 8-character code or QR link, and transfer files directly between devices through secure signed upload and download URLs. The lightweight UX is backed by authentication, guest access, STOMP/SockJS WebSockets, DigitalOcean Spaces, Stripe subscriptions, server-side plan enforcement, background cleanup, and CI/CD.",
       problem:
-        "Moving files across devices is still surprisingly clunky. People email files to themselves, upload to shared drives, install apps, create accounts, or expose permanent links. The technical challenge was to make the experience feel instant while still expiring sessions reliably, supporting large payloads, updating participants live, allowing guests safely, and enforcing paid limits on the server.",
+        "Moving files across devices is still surprisingly clunky. People email files to themselves, upload to shared drives, install apps, create accounts, or expose permanent links for one-time transfers. The technical challenge was making sessions feel instant while still expiring reliably, supporting large payloads without overloading the backend, updating connected users live, allowing guests safely, enforcing paid limits server-side, and processing Stripe webhooks safely across retries or out-of-order delivery.",
       solution:
-        "LazyDrop uses temporary drop sessions as the core abstraction. The frontend requests a signed upload URL, the browser uploads directly to DigitalOcean Spaces, then confirms the upload so the backend can persist metadata and broadcast a typed WebSocket event. File bytes never pass through the API server, and abandoned uploads do not create phantom database rows.",
+        "LazyDrop uses temporary drop sessions as the core abstraction. Each session owns a short code, QR/share link, owner, participants, files, notes, expiration timestamp, and status. Uploads use a two-phase signed URL flow: the frontend requests an upload URL, the browser uploads directly to DigitalOcean Spaces, the frontend confirms completion, and the backend persists metadata before broadcasting a typed WebSocket event. File bytes never pass through the API server, and abandoned uploads do not create phantom database rows.",
       metrics: [
         { value: "116", label: "backend Java source files" },
         { value: "42", label: "frontend JS/JSX source files" },
@@ -268,6 +358,103 @@ export const content = {
         { value: "29", label: "mapped backend controller operations" },
         { value: "14", label: "WebSocket event types" },
         { value: "8", label: "core database tables" },
+      ],
+      systemEyebrow: "Realtime transfer architecture",
+      systemTitle: "How LazyDrop moves files without routing bytes through the API",
+      systemDiagram: ["Session code", "Signed upload URL", "Object storage", "Metadata confirm", "WebSocket event"],
+      systemFlow: [
+        {
+          title: "Create drop room",
+          eyebrow: "Session",
+          detail: "The backend creates a temporary session with an 8-character code, QR/share link, owner, participants, expiration timestamp, and status.",
+          stack: ["Spring Boot", "PostgreSQL", "Flyway"],
+        },
+        {
+          title: "Join securely",
+          eyebrow: "Access",
+          detail: "Authenticated users join with Supabase JWTs while guests use cookies so quick participation does not bypass backend access control.",
+          stack: ["Supabase Auth", "guest cookies", "Spring Security"],
+        },
+        {
+          title: "Request upload",
+          eyebrow: "Validation",
+          detail: "The API checks session state, participant permissions, subscription tier, file count, participant count, notes, and max file size before issuing an upload URL.",
+          stack: ["plan limits", "Java 21", "JPA"],
+        },
+        {
+          title: "Upload directly",
+          eyebrow: "Storage",
+          detail: "The browser sends file bytes directly to DigitalOcean Spaces through an S3-compatible signed URL instead of streaming payloads through the backend.",
+          stack: ["DigitalOcean Spaces", "S3 signed URLs", "browser upload"],
+        },
+        {
+          title: "Confirm metadata",
+          eyebrow: "Persistence",
+          detail: "Only successful uploads are confirmed back to the backend, which persists file metadata and download tracking records.",
+          stack: ["PostgreSQL 16", "file metadata", "download audit"],
+        },
+        {
+          title: "Broadcast update",
+          eyebrow: "Realtime",
+          detail: "Participants subscribed to the session topic receive typed events for uploads, downloads, notes, thumbnails, joins, leaves, closure, and expiration.",
+          stack: ["STOMP", "SockJS", "WebSockets"],
+        },
+        {
+          title: "Bill and enforce",
+          eyebrow: "Stripe",
+          detail: "Checkout, billing portal, cancellation, reactivation, status sync, and webhook retry state feed backend-enforced plan limits.",
+          stack: ["Stripe", "webhooks", "subscriptions"],
+        },
+        {
+          title: "Clean expired data",
+          eyebrow: "Jobs",
+          detail: "Spring schedulers and LazyQueue hooks clean expired sessions, stale participants, storage files, thumbnails, and retryable webhook work.",
+          stack: ["Schedulers", "LazyQueue", "cleanup jobs"],
+        },
+      ],
+      simulationEyebrow: "Transfer lifecycle",
+      simulationTitle: "Signed upload and realtime delivery flow",
+      simulationLogTitle: "drop-session.log",
+      simulationResult: { title: "file_ready", detail: "metadata confirmed + peers notified" },
+      routeSimulation: [
+        "Create temporary drop session",
+        "Participant joins by QR link or session code",
+        "Validate plan and session limits",
+        "Generate signed upload URL",
+        "Browser uploads directly to Spaces",
+        "Confirm upload and persist metadata",
+        "Broadcast WebSocket file event",
+        "Generate signed download URL on demand",
+      ],
+      engineeringDecisions: [
+        {
+          title: "Signed URLs instead of backend uploads",
+          why: "Large file payloads should not consume API memory, bandwidth, or request time when object storage is built for that path.",
+          tradeoff: "Requires a confirmation step and storage cleanup, but keeps the backend focused on authorization, metadata, events, and billing.",
+        },
+        {
+          title: "Confirm before persisting file records",
+          why: "Users can abandon uploads, close tabs, or fail midway after receiving an upload URL.",
+          tradeoff: "Adds a two-phase flow, but prevents phantom database records for files that never reached storage.",
+        },
+        {
+          title: "Server-side plan enforcement",
+          why: "Guest, Free, Plus, and Pro limits are product rules and cannot be trusted to frontend checks.",
+          tradeoff: "Every write path needs limit checks, but direct API calls cannot bypass file-size, session, participant, file-count, or note limits.",
+        },
+        {
+          title: "Idempotent webhook storage",
+          why: "Stripe can retry events or deliver them out of order, so billing state cannot depend on one happy-path webhook attempt.",
+          tradeoff: "Webhook events need leases, retry attempts, and error metadata, but duplicate events and transient failures become manageable.",
+        },
+      ],
+      failureModes: [
+        "Expired sessions must reject new uploads and trigger cleanup",
+        "Guests need fast access without bypassing session authorization",
+        "Abandoned signed uploads must not create file records",
+        "Stripe duplicate or out-of-order webhooks must not corrupt subscription state",
+        "Canceled subscriptions must downgrade limits reliably",
+        "Disconnected participants and temporary storage need background cleanup",
       ],
       architecture: [
         {
@@ -388,13 +575,13 @@ export const content = {
         { label: "Live Site", href: "https://wheredidiapply.tech" },
         { label: "Case Study", href: "#project/wheredidiapply" },
       ],
-      tags: ["Next.js", "Spring Boot", "Gmail API", "Gemini", "OAuth", "GCP"],
+      tags: ["Next.js", "TypeScript", "Spring Boot", "Gmail API", "Gemini", "OAuth", "GCP"],
       overview:
         "WhereDidIApply is a privacy-first job application tracker that turns a Gmail inbox into a structured job-search dashboard. The app connects to Gmail with read-only OAuth, searches for job-related emails, classifies them with a hybrid regex and Gemini pipeline, deduplicates results by normalized company and role, and displays applications in an editable, searchable, exportable dashboard.",
       problem:
         "Job seekers apply across dozens or hundreds of roles, then lose track of confirmations, assessments, interviews, rejections, and offers buried in email. Manual spreadsheets are tedious and incomplete. Existing AI trackers can also create privacy risk if they centralize Gmail tokens or persist sensitive email data.",
       solution:
-        "The browser fetches Gmail messages directly with a read-only token that never leaves the client. A stateless Spring Boot backend receives only subject, sender, and body text for classification, processes it in memory, and returns structured records. Deterministic rules handle high-signal cases first, while Gemini 2.0 Flash is used only for ambiguous classification or field extraction.",
+        "The browser fetches Gmail messages directly with a read-only token that never leaves the client. A stateless Spring Boot backend receives only subject, sender, and body text for classification, processes it in memory, and returns structured records. Deterministic rules and marketing prefilters handle high-signal cases first, while Gemini 2.0 Flash runs at temperature 0.0 with a strict JSON schema for ambiguous classification or field extraction.",
       metrics: [
         { value: "1,500", label: "emails supported per backend scan run" },
         { value: "59", label: "Gmail phrase signals" },
@@ -404,6 +591,103 @@ export const content = {
         { value: "200", label: "parse requests per minute per run" },
         { value: "4", label: "backend concurrent parses per run" },
         { value: "0", label: "server-side databases for email results" },
+      ],
+      systemEyebrow: "Privacy-first AI pipeline",
+      systemTitle: "How WhereDidIApply turns Gmail into a local job-search dashboard",
+      systemDiagram: ["Browser Gmail scan", "Rules prefilter", "Stateless API", "Gemini fallback", "Local dashboard"],
+      systemFlow: [
+        {
+          title: "Authorize Gmail",
+          eyebrow: "Browser",
+          detail: "Google OAuth grants Gmail read-only access, and the token stays entirely in the browser instead of being sent to the backend.",
+          stack: ["Google OAuth", "Gmail read-only", "Next.js"],
+        },
+        {
+          title: "Search targeted mail",
+          eyebrow: "Gmail API",
+          detail: "The client uses job-search phrase signals, sender filters, scan windows, email limits, and worker counts to reduce inbox noise before parsing.",
+          stack: ["59 phrase signals", "17 sender filters", "scan controls"],
+        },
+        {
+          title: "Create scan run",
+          eyebrow: "Backend guardrail",
+          detail: "The backend issues HMAC-signed run tokens with quota, TTL, rate-limit, and concurrency controls for predictable large inbox scans.",
+          stack: ["HMAC tokens", "2-hour TTL", "rate limits"],
+        },
+        {
+          title: "Classify with rules",
+          eyebrow: "Deterministic",
+          detail: "Regex classifiers handle high-confidence application, interview, assessment, offer, rejection, and action-required messages before using the LLM.",
+          stack: ["34 status patterns", "10 extraction patterns", "marketing filter"],
+        },
+        {
+          title: "Fallback to Gemini",
+          eyebrow: "AI",
+          detail: "Ambiguous emails use Gemini 2.0 Flash with temperature 0.0 and structured JSON schema output for normalized fields.",
+          stack: ["Gemini 2.0 Flash", "JSON schema", "WebFlux"],
+        },
+        {
+          title: "Merge evidence",
+          eyebrow: "Normalizer",
+          detail: "Rules and Gemini outputs are merged by confidence, then deduplicated by normalized company and role with status priority.",
+          stack: ["dedupe", "status priority", "confidence merge"],
+        },
+        {
+          title: "Store locally",
+          eyebrow: "Privacy",
+          detail: "The dashboard stores results in browser localStorage with search, filters, sorting, editing, deletion, row expansion, and CSV export.",
+          stack: ["localStorage", "CSV export", "React"],
+        },
+        {
+          title: "Operate safely",
+          eyebrow: "Production",
+          detail: "Docker, GitHub Actions, Cloud Run deploys, OpenAPI docs, structured logs, health checks, and circuit breakers support production-style operation.",
+          stack: ["Docker", "Cloud Run", "Resilience4j"],
+        },
+      ],
+      simulationEyebrow: "Scan lifecycle",
+      simulationTitle: "Rules-first Gmail classification flow",
+      simulationLogTitle: "gmail-scan.log",
+      simulationResult: { title: "dashboard_ready", detail: "deduped applications cached locally" },
+      routeSimulation: [
+        "Authorize Gmail read-only access",
+        "Search targeted job-related emails",
+        "Batch messages through scan workers",
+        "Apply marketing and rules prefilters",
+        "Use Gemini only for ambiguous cases",
+        "Merge company, role, status, and links",
+        "Deduplicate by normalized company + role",
+        "Cache editable results locally and export CSV",
+      ],
+      engineeringDecisions: [
+        {
+          title: "Browser-owned Gmail token",
+          why: "Email OAuth credentials are highly sensitive, and the product does not need the backend to call Gmail.",
+          tradeoff: "The frontend owns more scan orchestration, but users do not have to trust the server with Gmail tokens.",
+        },
+        {
+          title: "Stateless backend classification",
+          why: "The backend only needs transient email text to classify a message and return structured JSON.",
+          tradeoff: "No central sync database, but email content and results are not persisted server-side.",
+        },
+        {
+          title: "Rules before LLM calls",
+          why: "Many job emails have strong deterministic signals, while LLM calls add latency, cost, and privacy exposure.",
+          tradeoff: "Requires maintaining regex patterns, but reduces unnecessary Gemini usage and improves predictability.",
+        },
+        {
+          title: "Run-level quotas and concurrency caps",
+          why: "Large inbox scans can otherwise turn into unbounded request bursts against both the backend and Gemini.",
+          tradeoff: "Adds scan token state and rate limiting, but keeps 1,500-email runs predictable.",
+        },
+      ],
+      failureModes: [
+        "OAuth tokens must never be sent to the backend",
+        "Marketing emails must be filtered before expensive AI classification",
+        "Duplicate company and role emails must merge into one application row",
+        "Older Applied messages must not override newer Interview, Offer, or Rejected signals",
+        "Large scans need quotas, rate limits, retries, and progress batching",
+        "Gemini failures need circuit breaker protection and rules-first fallback behavior",
       ],
       architecture: [
         {

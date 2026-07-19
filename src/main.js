@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=41";
-import { appTemplate } from "./components.js?v=41";
+import { content } from "./content.js?v=43";
+import { appTemplate } from "./components.js?v=43";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -27,20 +27,16 @@ function render() {
 function setupReveal() {
   const revealTargets = document.querySelectorAll(
     [
-      ".project-card",
-      ".toolbox-card",
-      ".quote-card",
-      ".contact-card",
-      ".project-visual",
-      ".project-story-card",
-      ".project-detail-card",
-      ".project-metric-card",
+      ".project-feature",
+      ".experience-entry",
+      ".afterword-panel",
+      ".case-evidence-surface",
+      ".story-beat",
+      ".case-facts",
       ".project-system-section",
       ".route-simulation-section",
       ".decision-drawer",
-      ".failure-card",
-      ".proof-column",
-      ".project-bullet-list li",
+      ".case-appendix",
     ].join(", ")
   );
 
@@ -414,19 +410,6 @@ function createElasticTracker(element, handlers = {}) {
 }
 
 function setupElasticEffects() {
-  document.querySelectorAll(".card, .project-card, .project-detail-card, .project-visual").forEach((card) => {
-    createElasticTracker(card, {
-      speed: 0.1,
-      maxStretch: 0.16,
-      onFrame({ angle, scale, x, y }) {
-        card.style.setProperty("--x", `${x}px`);
-        card.style.setProperty("--y", `${y}px`);
-        card.style.setProperty("--glow-angle", `${angle}deg`);
-        card.style.setProperty("--glow-scale-x", String(1 + scale));
-        card.style.setProperty("--glow-scale-y", String(1 - scale));
-      },
-    });
-  });
 
   const portraitCard = document.querySelector(".portrait-card");
 

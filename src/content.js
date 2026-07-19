@@ -971,7 +971,6 @@ sequenceDiagram
       description:
         "A backend migration that moved Spotlight from a frontend-heavy Supabase-direct model to server-owned APIs, PostgreSQL persistence, and WebSocket chat.",
       category: "Mobile Backend Migration",
-      image: "./public/assets/work-axilab.jpg",
       url: "https://github.com/10xDeVv",
       proof: "Spring Boot backend migration · PostgreSQL-owned app data · STOMP realtime chat",
       links: [

@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=43";
+import { content } from "./content.js?v=48";
 
 const {
   contact,
@@ -58,6 +58,7 @@ export function appTemplate() {
       ${Header()}
       <main class="main">
         ${HomepageHero()}
+        ${HybridSystemLedger()}
         ${FeaturedWork()}
         ${ExperienceTimeline()}
         ${Afterword()}
@@ -114,6 +115,30 @@ function HomepageHero() {
         </div>
         <p class="availability">${profile.availability}</p>
       </aside>
+    </section>
+  `;
+}
+
+function HybridSystemLedger() {
+  return `
+    <section class="hybrid-system-ledger" aria-labelledby="system-ledger-title">
+      <div>
+        <p class="section-kicker">Product systems</p>
+        <h2 id="system-ledger-title">Four case files. Four explicit system boundaries.</h2>
+      </div>
+      <ol>
+        ${projects
+          .map(
+            (project, index) => `
+              <li>
+                <span>${String(index + 1).padStart(2, "0")}</span>
+                <strong>${project.title}</strong>
+                <p>${project.systemTitle || firstSentence(project.solution) || project.category}</p>
+              </li>
+            `
+          )
+          .join("")}
+      </ol>
     </section>
   `;
 }
@@ -245,6 +270,7 @@ function ProjectDetailPage(project) {
         <a class="back-link" href="#work" aria-label="Back to selected projects">← Selected work</a>
         ${ProjectThesis(project, detailLinks)}
         ${ProjectExecutiveSummary(project)}
+        ${HybridProductArtifact(project)}
         ${ProjectQuickNavigation(project)}
         ${ProjectEvidenceSurface(project)}
         ${ProjectStorySection(project)}
@@ -295,6 +321,47 @@ function ProjectExecutiveSummary(project) {
         <div><dt>Decision</dt><dd>${firstSentence(project.solution) || project.proof}</dd></div>
         <div><dt>Proof</dt><dd>${project.proof}</dd></div>
       </dl>
+    </section>
+  `;
+}
+
+function HybridProductArtifact(project) {
+  const intentItems =
+    project.systemFlow?.map((step) => ({ title: step.title, detail: step.detail })) ||
+    [{ title: "System decision", detail: firstSentence(project.solution) || project.proof }];
+  const traceItems =
+    project.routeSimulation?.map((step, index) => ({ title: String(index + 1).padStart(2, "0"), detail: step })) ||
+    (project.features || []).slice(0, 3).map((item, index) => ({ title: String(index + 1).padStart(2, "0"), detail: item.detail || item.title || item }));
+  const evidenceItems = (project.metrics || project.impact || project.features || [])
+    .slice(0, 3)
+    .map((item) => ({ title: item.value || item.title || project.title, detail: item.label || item.detail || item }));
+  const artifactId = `artifact-${project.slug}`;
+
+  return `
+    <section class="hybrid-product-artifact" id="project-artifact" aria-labelledby="${artifactId}-title">
+      <header>
+        <div>
+          <p class="section-kicker">Primary product system</p>
+          <h2 id="${artifactId}-title">The system before the chapters.</h2>
+        </div>
+        <p>${firstSentence(project.proof) || project.headline}</p>
+      </header>
+      <div class="hybrid-artifact-tabs" data-hybrid-tabs>
+        <div role="tablist" aria-label="${project.title} product system views">
+          <button type="button" role="tab" id="${artifactId}-intent-tab" aria-selected="true" aria-controls="${artifactId}-intent" tabindex="0">System intent</button>
+          <button type="button" role="tab" id="${artifactId}-trace-tab" aria-selected="false" aria-controls="${artifactId}-trace" tabindex="-1">Execution trace</button>
+          <button type="button" role="tab" id="${artifactId}-evidence-tab" aria-selected="false" aria-controls="${artifactId}-evidence" tabindex="-1">Evidence</button>
+        </div>
+        <section class="hybrid-artifact-stage" id="${artifactId}-intent" role="tabpanel" aria-labelledby="${artifactId}-intent-tab">
+          <ol>${intentItems.map((item, index) => `<li><span>${String(index + 1).padStart(2, "0")}</span><div><strong>${item.title}</strong><p>${item.detail}</p></div></li>`).join("")}</ol>
+        </section>
+        <section class="hybrid-artifact-stage" id="${artifactId}-trace" role="tabpanel" aria-labelledby="${artifactId}-trace-tab" hidden>
+          <ol>${traceItems.map((item) => `<li><span>${item.title}</span><p>${item.detail}</p></li>`).join("")}</ol>
+        </section>
+        <section class="hybrid-artifact-stage" id="${artifactId}-evidence" role="tabpanel" aria-labelledby="${artifactId}-evidence-tab" hidden>
+          <ol>${evidenceItems.map((item) => `<li><strong>${item.title}</strong><p>${item.detail}</p></li>`).join("")}</ol>
+        </section>
+      </div>
     </section>
   `;
 }

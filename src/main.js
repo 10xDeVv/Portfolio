@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=14";
-import { appTemplate } from "./components.js?v=27";
+import { content } from "./content.js?v=41";
+import { appTemplate } from "./components.js?v=41";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -103,17 +103,54 @@ function setupContactForm() {
   const form = document.querySelector(".contact-form");
   if (!form) return;
 
+  const error = form.querySelector("#contact-form-error");
+  const nameField = form.elements.namedItem("name");
+  const messageField = form.elements.namedItem("message");
+
+  const showError = (message, invalidFields) => {
+    invalidFields.forEach((field) => field?.setAttribute("aria-invalid", "true"));
+    if (!error) return;
+
+    error.textContent = message;
+    error.hidden = false;
+    error.focus();
+  };
+
+  const clearError = () => {
+    [nameField, messageField].forEach((field) => field?.removeAttribute("aria-invalid"));
+    if (!error) return;
+
+    error.textContent = "";
+    error.hidden = true;
+  };
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const data = new FormData(form);
     const name = String(data.get("name") || "").trim();
-    const contact = String(data.get("email") || "").trim();
+    const contact = String(data.get("contact") || "").trim();
     const message = String(data.get("message") || "").trim();
+    const missingFields = [
+      !name && { label: "name", field: nameField },
+      !message && { label: "message", field: messageField },
+    ].filter(Boolean);
+
+    if (missingFields.length) {
+      const missingLabels = missingFields.map((item) => item.label).join(" and ");
+      showError(
+        `Please enter your ${missingLabels} before opening your email client.`,
+        missingFields.map((item) => item.field)
+      );
+      return;
+    }
+
+    clearError();
+
     const recipient = form.dataset.recipient || "adebowale.ca@gmail.com";
-    const subject = encodeURIComponent(`Portfolio contact${name ? ` from ${name}` : ""}`);
+    const subject = encodeURIComponent(`Portfolio contact from ${name}`);
     const body = encodeURIComponent(
-      [`Name: ${name || "Not provided"}`, `Best contact: ${contact || "Not provided"}`, "", message].join("\n")
+      [`Name: ${name}`, `Best contact: ${contact || "Not provided"}`, "", message].join("\n")
     );
 
     window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
@@ -267,14 +304,16 @@ function setupDiagramPan() {
 }
 
 function setupResponsiveProjectDetails() {
+  let compact = false;
+
   const apply = () => {
-    const compact = window.matchMedia("(max-width: 900px)").matches;
-    document.querySelectorAll(".project-story-card").forEach((card, index) => {
-      card.open = !compact || index === 0;
-    });
-    document.querySelectorAll(".decision-drawer").forEach((drawer) => {
-      if (compact) drawer.open = false;
-    });
+    const nextCompact = window.matchMedia("(max-width: 900px)").matches;
+    if (nextCompact && !compact) {
+      document.querySelectorAll(".decision-drawer").forEach((drawer) => {
+        drawer.open = false;
+      });
+    }
+    compact = nextCompact;
   };
 
   apply();

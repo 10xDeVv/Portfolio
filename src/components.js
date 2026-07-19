@@ -30,6 +30,21 @@ const renderLinks = (links = [], className = "action-links") => {
   `;
 };
 
+function HeroContactActions() {
+  const primaryLink = profile.contactLinks.find((link) => link.primary);
+  const secondaryLinks = profile.contactLinks.filter((link) => !link.primary);
+
+  return `
+    <a class="featured-work-jump" href="#work">View selected work</a>
+    ${
+      primaryLink
+        ? `<a class="hero-primary-cta" href="${primaryLink.href}"${linkAttrs(primaryLink.href)}>${primaryLink.label}</a>`
+        : ""
+    }
+    ${renderLinks(secondaryLinks, "hero-contact-links")}
+  `;
+}
+
 
 export function appTemplate() {
   const activeProject = getActiveProject();
@@ -135,8 +150,8 @@ function BioCard() {
         ${profile.proofChips.map((chip) => `<span>${chip}</span>`).join("")}
       </div>
       <div class="hero-contact-strip">
-        <p>Open to SWE internships</p>
-        ${renderLinks(profile.contactLinks, "hero-contact-links")}
+        <p>${profile.availability}</p>
+        ${HeroContactActions()}
       </div>
     `,
   });
@@ -144,23 +159,35 @@ function BioCard() {
 
 
 function ExperienceCard() {
+  const [currentExperience, ...earlierExperience] = experience;
+  const renderExperienceItem = (item) => `
+    <article class="experience-item">
+      <h3 class="heading-4">${item.role}</h3>
+      <p class="heading-5">${item.company}</p>
+      <p class="heading-6">${item.years}</p>
+      ${ExperienceDetail(item.detail)}
+    </article>
+  `;
+  const earlierExperienceLabel = `Earlier experience (${earlierExperience.length} ${
+    earlierExperience.length === 1 ? "role" : "roles"
+  })`;
+
   return Card({
     className: "experience-card",
     children: `
       <h2 class="heading-3">Experience</h2>
       <div class="experience-list">
-        ${experience
-          .map(
-            (item) => `
-              <article class="experience-item">
-                <h3 class="heading-4">${item.role}</h3>
-                <p class="heading-5">${item.company}</p>
-                <p class="heading-6">${item.years}</p>
-                ${ExperienceDetail(item.detail)}
-              </article>
+        ${currentExperience ? renderExperienceItem(currentExperience) : ""}
+        ${
+          earlierExperience.length
+            ? `
+              <details class="experience-history">
+                <summary>${earlierExperienceLabel}</summary>
+                ${earlierExperience.map(renderExperienceItem).join("")}
+              </details>
             `
-          )
-          .join("")}
+            : ""
+        }
       </div>
     `,
   });
@@ -231,6 +258,8 @@ function ProjectDetailPage(project) {
           </div>
           ${renderLinks(detailLinks, "project-hero-links")}
         </section>
+        ${ProjectExecutiveSummary(project)}
+        ${ProjectQuickNavigation(project)}
         <div class="project-tags detail-tags">
           ${project.tags.map((tag) => `<span>${tag}</span>`).join("")}
         </div>
@@ -249,19 +278,95 @@ function ProjectDetailPage(project) {
   `;
 }
 
-function ProjectStorySection(project) {
+function ProjectExecutiveSummary(project) {
+  const keyDecision = project.engineeringDecisions?.[0] || project.impact?.[0];
+  const keyDecisionText = keyDecision
+    ? `${keyDecision.title}: ${keyDecision.why || keyDecision.detail || keyDecision.tradeoff}`
+    : project.proof;
+
+  return `
+    <section class="project-executive-summary" aria-label="${project.title} executive summary">
+      <article class="project-summary-item">
+        <h2>Scope</h2>
+        <p>${project.category}</p>
+        <p>${project.headline}</p>
+      </article>
+      <article class="project-summary-item">
+        <h2>Problem / value</h2>
+        <p>${firstSentence(project.overview) || project.headline}</p>
+      </article>
+      <article class="project-summary-item">
+        <h2>Key decision / evidence</h2>
+        <p>${keyDecisionText}</p>
+        <p>${project.proof}</p>
+      </article>
+    </section>
+  `;
+}
+
+function firstSentence(value) {
+  if (!value) return "";
+
+  const end = value.search(/[.!?](?:\s|$)/);
+  return end === -1 ? value : value.slice(0, end + 1);
+}
+
+function ProjectQuickNavigation(project) {
   const sections = [
+    getProjectStorySections(project).length && { href: "#project-story", label: "Overview" },
+    project.metrics?.length && { href: "#project-metrics", label: "Repo Metrics" },
+    project.systemFlow?.length && {
+      href: "#project-system",
+      label: project.systemTitle || `How ${project.title} works under load`,
+    },
+    project.routeSimulation?.length && {
+      href: "#project-simulation",
+      label: project.simulationTitle || "What happens after the request starts",
+    },
+    (project.engineeringDecisions?.length || project.failureModes?.length) && {
+      href: "#project-decisions",
+      label: "Decisions, tradeoffs, and stress cases",
+    },
+    [project.architecture, project.differentiators, project.features, project.impact].some((items) => items?.length) && {
+      href: "#project-proof",
+      label: "Proof board",
+    },
+    project.resumeBullets?.length && {
+      href: "#project-contributions",
+      label: "Technical Contributions",
+    },
+  ].filter(Boolean);
+
+  if (!sections.length) return "";
+
+  return `
+    <nav class="project-quick-nav" aria-label="Case study sections">
+      <p>On this page</p>
+      <ul>
+        ${sections.map((section) => `<li><a href="${section.href}">${section.label}</a></li>`).join("")}
+      </ul>
+    </nav>
+  `;
+}
+
+function getProjectStorySections(project) {
+  return [
     ["Overview", project.overview],
     ["The Problem", project.problem],
     ["The Solution", project.solution],
-  ];
+  ].filter(([, text]) => text);
+}
+
+function ProjectStorySection(project) {
+  const sections = getProjectStorySections(project);
+  if (!sections.length) return "";
 
   return `
-    <section class="project-story-section">
+    <section class="project-story-section" id="project-story">
       ${sections
         .map(
           ([title, text], index) => `
-            <details class="project-story-card" ${index === 0 ? "open" : "open"}>
+            <details class="project-story-card"${index === 0 ? " open" : ""}>
               <summary>${title}</summary>
               <p>${text}</p>
             </details>
@@ -302,6 +407,7 @@ function ProjectArchitectureMap(project) {
       ${DiagramControls()}
       <pre class="mermaid">${project.mermaidDiagram}</pre>
     </div>
+    ${DiagramGuidance(project.diagramGuidance?.architecture, "Architecture")}
   `;
 }
 
@@ -315,6 +421,16 @@ function DiagramControls() {
   `;
 }
 
+function DiagramGuidance(text, diagramType) {
+  if (!text) return "";
+
+  return `
+    <aside class="diagram-guidance" aria-label="${diagramType} diagram guidance">
+      <p>${text}</p>
+    </aside>
+  `;
+}
+
 function ProjectSystemSection(project) {
   if (!project.systemFlow?.length) return "";
 
@@ -322,7 +438,7 @@ function ProjectSystemSection(project) {
   const architectureMap = ProjectArchitectureMap(project);
 
   return `
-    <section class="project-detail-section project-system-section">
+    <section class="project-detail-section project-system-section" id="project-system">
       <div class="project-section-heading">
         <p class="project-eyebrow">${project.systemEyebrow || "Interactive architecture"}</p>
         <h2>${project.systemTitle || `How ${project.title} works under load`}</h2>
@@ -363,7 +479,7 @@ function ProjectSimulationSection(project) {
   if (!project.routeSimulation?.length) return "";
 
   return `
-    <section class="project-detail-section route-simulation-section">
+    <section class="project-detail-section route-simulation-section" id="project-simulation">
       <div class="project-section-heading">
         <p class="project-eyebrow">${project.simulationEyebrow || "Execution trace"}</p>
         <h2>${project.simulationTitle || "What happens after the request starts"}</h2>
@@ -373,7 +489,8 @@ function ProjectSimulationSection(project) {
           ? `<div class="architecture-diagram lifecycle-diagram" aria-label="${project.title} lifecycle diagram">
               ${DiagramControls()}
               <pre class="mermaid">${project.lifecycleDiagram}</pre>
-            </div>`
+            </div>
+            ${DiagramGuidance(project.diagramGuidance?.lifecycle, "Lifecycle")}`
           : ""
       }
       <div class="route-simulation trace-layout" data-route-simulation>
@@ -400,7 +517,7 @@ function ProjectDecisionSection(project) {
   if (!project.engineeringDecisions?.length && !project.failureModes?.length) return "";
 
   return `
-    <section class="project-detail-section decision-section">
+    <section class="project-detail-section decision-section" id="project-decisions">
       <div class="project-section-heading decision-heading">
         <p class="project-eyebrow">Tradeoff notes</p>
         <h2>Decisions, tradeoffs, and stress cases</h2>
@@ -450,7 +567,7 @@ function ProjectProofBoard(project) {
   if (!sections.length) return "";
 
   return `
-    <section class="project-detail-section proof-board-section">
+    <section class="project-detail-section proof-board-section" id="project-proof">
       <div class="project-section-heading">
         <p class="project-eyebrow">Proof board</p>
         <h2>What to remember without reading every card</h2>
@@ -489,7 +606,7 @@ function ProjectMetricGrid(items) {
   if (!items?.length) return "";
 
   return `
-    <section class="project-detail-section project-metrics-section">
+    <section class="project-detail-section project-metrics-section" id="project-metrics">
       <h2>Repo Metrics</h2>
       <div class="project-metrics-grid">
         ${items
@@ -511,7 +628,7 @@ function ProjectBulletSection(title, items) {
   if (!items?.length) return "";
 
   return `
-    <section class="project-detail-section">
+    <section class="project-detail-section" id="project-contributions">
       <h2>${title}</h2>
       <ul class="project-bullet-list">
         ${items.map((item) => `<li>${item}</li>`).join("")}
@@ -574,19 +691,46 @@ function ContactCard() {
     children: `
       <h2 class="heading-3">${labels.contact}</h2>
       <p class="contact-intro body body-muted">${contact.detail}</p>
-      <form class="contact-form" data-recipient="${contact.email}">
+      <form class="contact-form" data-recipient="${contact.email}" novalidate aria-describedby="contact-form-error">
         <div class="form-field">
           <label class="body body-muted" for="name">${contact.nameLabel}</label>
-          <input class="input" id="name" name="name" type="text" value="${contact.name}" />
+          <input
+            class="input"
+            id="name"
+            name="name"
+            type="text"
+            value="${contact.defaults.name}"
+            placeholder="${contact.placeholders.name}"
+            required
+            aria-required="true"
+            aria-describedby="contact-form-error"
+          />
         </div>
         <div class="form-field">
-          <label class="body body-muted" for="email">${contact.emailLabel}</label>
-          <input class="input" id="email" name="email" type="${contact.emailInputType || "email"}" value="${contact.emailDefault}" />
+          <label class="body body-muted" for="contact">${contact.emailLabel}</label>
+          <input
+            class="input"
+            id="contact"
+            name="contact"
+            type="text"
+            value="${contact.defaults.contact}"
+            placeholder="${contact.placeholders.contact}"
+            aria-describedby="contact-form-error"
+          />
         </div>
         <div class="form-field">
           <label class="body body-muted" for="message">${contact.messageLabel}</label>
-          <textarea class="textarea" id="message" name="message">${contact.message}</textarea>
+          <textarea
+            class="textarea"
+            id="message"
+            name="message"
+            placeholder="${contact.placeholders.message}"
+            required
+            aria-required="true"
+            aria-describedby="contact-form-error"
+          >${contact.defaults.message}</textarea>
         </div>
+        <p class="contact-form-error" id="contact-form-error" role="alert" tabindex="-1" hidden></p>
         <button class="submit-button" type="submit">${labels.submit}</button>
         <a class="resume-link" href="${profile.resume}" target="_blank" rel="noreferrer">${labels.resume}</a>
       </form>

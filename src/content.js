@@ -12,6 +12,7 @@ export const content = {
   profile: {
     name: "Adebowale Adebayo",
     role: "Backend / Cloud / Full-Stack SWE Intern",
+    availability: "Open to SWE internships",
     location: "Fredericton, Canada",
     email: "adebowale.ca@gmail.com",
     contactHref: "mailto:adebowale.ca@gmail.com",
@@ -23,7 +24,7 @@ export const content = {
     proofChips: ["Backend-heavy products", "Cloud + distributed systems", "Product-minded UI/UX"],
     heroMeta: ["CS @ UNB", "Fredericton, Canada", "Backend / Cloud / Full-stack"],
     contactLinks: [
-      { label: "Email", href: "mailto:adebowale.ca@gmail.com" },
+      { label: "Email", href: "mailto:adebowale.ca@gmail.com", primary: true },
       { label: "LinkedIn", href: "https://www.linkedin.com/in/waally-xyz/" },
       { label: "GitHub", href: "https://github.com/10xDeVv" },
       { label: "Resume", href: "./public/assets/resume.pdf" },
@@ -100,6 +101,7 @@ export const content = {
   projects: [
     {
       slug: "wayward",
+      featuredRank: 1,
       title: "Wayward",
       headline: "Production-style geospatial routing that generates scenic driving loops from time, location, and route vibe.",
       description:
@@ -154,6 +156,10 @@ flowchart LR
   Kafka -->|push via WS| Notify
   Notify -->|WebSocket / polling| Client
       `,
+      diagramGuidance: {
+        architecture: "Route requests become Kafka jobs; workers combine cached scenic H3 data with local OSRM geometry before publishing results.",
+        lifecycle: "The API acknowledges the job immediately; the worker generates, scores, persists, and then notifies the browser.",
+      },
       systemFlow: [
         {
           title: "Route request",
@@ -389,6 +395,7 @@ sequenceDiagram
     },
     {
       slug: "lazydrop",
+      featuredRank: 2,
       title: "LazyDrop",
       headline: "Instant cross-device file transfer with realtime sessions, signed uploads, and subscription enforcement.",
       description:
@@ -445,6 +452,10 @@ flowchart LR
   Jobs -->|expire sessions| DB
   Jobs -->|delete expired objects| Spaces
       `,
+      diagramGuidance: {
+        architecture: "Browsers transfer bytes directly to DigitalOcean Spaces with signed URLs while the API manages access, metadata, and realtime session state.",
+        lifecycle: "After a session is created and joined, upload confirmation persists metadata and broadcasts the update to participants.",
+      },
       systemFlow: [
         {
           title: "Create drop room",
@@ -668,6 +679,7 @@ sequenceDiagram
     },
     {
       slug: "wheredidiapply",
+      featuredRank: 3,
       title: "WhereDidIApply",
       headline: "Privacy-first Gmail job tracker with a rules-first classifier and Gemini fallback.",
       description:
@@ -717,8 +729,10 @@ flowchart LR
   API -->|classified records| Browser
   Browser -->|cache + edit| Local
       `,
-      architectureNote:
-        "No arrow from the browser to the backend carries Gmail OAuth tokens. The backend receives only email text snippets for in-memory classification.",
+      diagramGuidance: {
+        architecture: "No arrow from the browser to the backend carries Gmail OAuth tokens. The backend receives only email text snippets for in-memory classification.",
+        lifecycle: "The browser fetches Gmail with its read-only token, sends snippets for in-memory classification, and stores the resulting dashboard locally.",
+      },
       systemFlow: [
         {
           title: "Authorize Gmail",
@@ -951,6 +965,7 @@ sequenceDiagram
     },
     {
       slug: "spotlight",
+      featuredRank: 4,
       title: "Spotlight",
       headline: "Spring Boot backend migration for a student social app with discovery, activities, safety, and chat.",
       description:
@@ -1015,16 +1030,23 @@ sequenceDiagram
   quote: "Slow motion is better than no motion.",
 
   contact: {
-    name: "Adebowale Adebayo",
     email: "adebowale.ca@gmail.com",
     headline: "Want to talk backend, cloud, platform, or full-stack product work?",
     detail:
       "Send me a note and your email client will open with the message addressed to me.",
+    defaults: {
+      name: "",
+      contact: "",
+      message: "",
+    },
+    placeholders: {
+      name: "Your name",
+      contact: "Email, LinkedIn, or GitHub profile",
+      message: "Tell me about the backend, platform, or full-stack role…",
+    },
     nameLabel: "Name",
-    emailDefault: "LinkedIn or GitHub DMs",
     emailInputType: "text",
     emailLabel: "Best contact",
-    message: "Tell me about the backend, platform, or full-stack role...",
     messageLabel: "Message",
     links: [
       { label: "Email me", href: "mailto:adebowale.ca@gmail.com" },

@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=48";
+import { content } from "./content.js?v=51";
 
 const {
   contact,
@@ -58,7 +58,6 @@ export function appTemplate() {
       ${Header()}
       <main class="main">
         ${HomepageHero()}
-        ${HybridSystemLedger()}
         ${FeaturedWork()}
         ${ExperienceTimeline()}
         ${Afterword()}
@@ -119,29 +118,6 @@ function HomepageHero() {
   `;
 }
 
-function HybridSystemLedger() {
-  return `
-    <section class="hybrid-system-ledger" aria-labelledby="system-ledger-title">
-      <div>
-        <p class="section-kicker">Product systems</p>
-        <h2 id="system-ledger-title">Four case files. Four explicit system boundaries.</h2>
-      </div>
-      <ol>
-        ${projects
-          .map(
-            (project, index) => `
-              <li>
-                <span>${String(index + 1).padStart(2, "0")}</span>
-                <strong>${project.title}</strong>
-                <p>${project.systemTitle || firstSentence(project.solution) || project.category}</p>
-              </li>
-            `
-          )
-          .join("")}
-      </ol>
-    </section>
-  `;
-}
 
 function FeaturedWork() {
   return `
@@ -237,18 +213,7 @@ function ExperienceDetail(detail) {
 
 function Afterword() {
   return `
-    <section class="afterword" aria-label="Tools, motivation, and contact">
-      <section class="toolbox-card afterword-panel" aria-labelledby="tools-title">
-        <p class="section-kicker">${labels.toolbox}</p>
-        <h2 class="afterword-title" id="tools-title">Tools are selected for the boundary they clarify.</h2>
-        <ul class="toolbox-icons" aria-label="Technologies">
-          ${tools.map((tool) => ToolIcon(tool)).join("")}
-        </ul>
-      </section>
-      <section class="quote-card afterword-panel" aria-labelledby="quote-title">
-        <p class="section-kicker" id="quote-title">${labels.motivation}</p>
-        <p class="quote-text">“${content.quote}”</p>
-      </section>
+    <section class="afterword" aria-label="Contact">
       ${ContactCard()}
     </section>
   `;
@@ -270,7 +235,6 @@ function ProjectDetailPage(project) {
         <a class="back-link" href="#work" aria-label="Back to selected projects">← Selected work</a>
         ${ProjectThesis(project, detailLinks)}
         ${ProjectExecutiveSummary(project)}
-        ${HybridProductArtifact(project)}
         ${ProjectQuickNavigation(project)}
         ${ProjectEvidenceSurface(project)}
         ${ProjectStorySection(project)}
@@ -325,46 +289,6 @@ function ProjectExecutiveSummary(project) {
   `;
 }
 
-function HybridProductArtifact(project) {
-  const intentItems =
-    project.systemFlow?.map((step) => ({ title: step.title, detail: step.detail })) ||
-    [{ title: "System decision", detail: firstSentence(project.solution) || project.proof }];
-  const traceItems =
-    project.routeSimulation?.map((step, index) => ({ title: String(index + 1).padStart(2, "0"), detail: step })) ||
-    (project.features || []).slice(0, 3).map((item, index) => ({ title: String(index + 1).padStart(2, "0"), detail: item.detail || item.title || item }));
-  const evidenceItems = (project.metrics || project.impact || project.features || [])
-    .slice(0, 3)
-    .map((item) => ({ title: item.value || item.title || project.title, detail: item.label || item.detail || item }));
-  const artifactId = `artifact-${project.slug}`;
-
-  return `
-    <section class="hybrid-product-artifact" id="project-artifact" aria-labelledby="${artifactId}-title">
-      <header>
-        <div>
-          <p class="section-kicker">Primary product system</p>
-          <h2 id="${artifactId}-title">The system before the chapters.</h2>
-        </div>
-        <p>${firstSentence(project.proof) || project.headline}</p>
-      </header>
-      <div class="hybrid-artifact-tabs" data-hybrid-tabs>
-        <div role="tablist" aria-label="${project.title} product system views">
-          <button type="button" role="tab" id="${artifactId}-intent-tab" aria-selected="true" aria-controls="${artifactId}-intent" tabindex="0">System intent</button>
-          <button type="button" role="tab" id="${artifactId}-trace-tab" aria-selected="false" aria-controls="${artifactId}-trace" tabindex="-1">Execution trace</button>
-          <button type="button" role="tab" id="${artifactId}-evidence-tab" aria-selected="false" aria-controls="${artifactId}-evidence" tabindex="-1">Evidence</button>
-        </div>
-        <section class="hybrid-artifact-stage" id="${artifactId}-intent" role="tabpanel" aria-labelledby="${artifactId}-intent-tab">
-          <ol>${intentItems.map((item, index) => `<li><span>${String(index + 1).padStart(2, "0")}</span><div><strong>${item.title}</strong><p>${item.detail}</p></div></li>`).join("")}</ol>
-        </section>
-        <section class="hybrid-artifact-stage" id="${artifactId}-trace" role="tabpanel" aria-labelledby="${artifactId}-trace-tab" hidden>
-          <ol>${traceItems.map((item) => `<li><span>${item.title}</span><p>${item.detail}</p></li>`).join("")}</ol>
-        </section>
-        <section class="hybrid-artifact-stage" id="${artifactId}-evidence" role="tabpanel" aria-labelledby="${artifactId}-evidence-tab" hidden>
-          <ol>${evidenceItems.map((item) => `<li><strong>${item.title}</strong><p>${item.detail}</p></li>`).join("")}</ol>
-        </section>
-      </div>
-    </section>
-  `;
-}
 
 function firstSentence(value) {
   if (!value) return "";
@@ -541,7 +465,7 @@ function ProjectSystemSection(project) {
         </article>
       </div>
       <details class="case-disclosure architecture-disclosure">
-        <summary><span>Architecture evidence</span><small>Mermaid map · pan and zoom</small></summary>
+        <summary><span>Architecture map</span><small>01 interactive map</small></summary>
         <div class="disclosure-body">${ProjectArchitectureMap(project)}${project.architectureNote ? `<p class="architecture-note">${project.architectureNote}</p>` : ""}</div>
       </details>
     </section>
@@ -558,7 +482,7 @@ function ProjectSimulationSection(project) {
         <h2 id="simulation-title">${project.simulationTitle || "What happens after the request starts"}</h2>
       </header>
       <details class="case-disclosure">
-        <summary><span>Open the trace</span><small>${project.simulationEyebrow || "Request lifecycle"}</small></summary>
+        <summary><span>Request lifecycle</span><small>${String(project.routeSimulation.length).padStart(2, "0")} steps</small></summary>
         <div class="disclosure-body">
           ${
             project.lifecycleDiagram
@@ -601,7 +525,7 @@ function ProjectDecisionSection(project) {
       </div>
       ${
         project.failureModes?.length
-          ? `<details class="case-disclosure failure-disclosure"><summary><span>Handled constraints</span><small>${project.failureModes.length} stress cases</small></summary><div class="disclosure-body"><ul class="failure-list">${project.failureModes.map((item) => `<li>${item}</li>`).join("")}</ul></div></details>`
+          ? `<details class="case-disclosure failure-disclosure"><summary><span>Failure safeguards</span><small>${String(project.failureModes.length).padStart(2, "0")} scenarios</small></summary><div class="disclosure-body"><ul class="failure-list">${project.failureModes.map((item) => `<li>${item}</li>`).join("")}</ul></div></details>`
           : ""
       }
     </section>
@@ -654,7 +578,7 @@ function ContactCard() {
   return `
     <section class="contact-card afterword-panel" id="contact" aria-labelledby="contact-title">
       <p class="section-kicker">Contact</p>
-      <h2 class="afterword-title" id="contact-title">${labels.contact}</h2>
+      <h2 class="afterword-title" id="contact-title">${contact.headline}</h2>
       <p class="contact-intro">${contact.detail}</p>
       <form class="contact-form" data-recipient="${contact.email}" novalidate aria-describedby="contact-form-error">
         <div class="form-field"><label for="name">${contact.nameLabel}</label><input class="input" id="name" name="name" type="text" value="${contact.defaults.name}" placeholder="${contact.placeholders.name}" required aria-required="true" aria-describedby="contact-form-error" /></div>

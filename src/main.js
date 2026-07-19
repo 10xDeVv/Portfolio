@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=48";
-import { appTemplate } from "./components.js?v=48";
+import { content } from "./content.js?v=51";
+import { appTemplate } from "./components.js?v=51";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -18,7 +18,6 @@ function render() {
   setupElasticEffects();
   setupMenu();
   setupContactForm();
-  setupHybridTabs();
   setupSystemExplorer();
   setupMermaidDiagrams().then(setupDiagramPan);
   setupResponsiveProjectDetails();
@@ -96,38 +95,6 @@ function setupMenu() {
   });
 }
 
-function setupHybridTabs() {
-  document.querySelectorAll("[data-hybrid-tabs]").forEach((container) => {
-    const tabs = [...container.querySelectorAll('[role="tab"]')];
-    const panels = tabs
-      .map((tab) => document.getElementById(tab.getAttribute("aria-controls")))
-      .filter(Boolean);
-
-    const activate = (nextIndex) => {
-      tabs.forEach((tab, index) => {
-        const selected = index === nextIndex;
-        tab.setAttribute("aria-selected", String(selected));
-        tab.tabIndex = selected ? 0 : -1;
-        panels[index].hidden = !selected;
-      });
-    };
-
-    tabs.forEach((tab, index) => {
-      tab.addEventListener("click", () => activate(index));
-      tab.addEventListener("keydown", (event) => {
-        const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
-        if (!keys.includes(event.key)) return;
-        event.preventDefault();
-        const nextIndex =
-          event.key === "Home" ? 0 :
-          event.key === "End" ? tabs.length - 1 :
-          (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
-        activate(nextIndex);
-        tabs[nextIndex].focus();
-      });
-    });
-  });
-}
 
 function setupContactForm() {
   const form = document.querySelector(".contact-form");
@@ -197,15 +164,27 @@ function setupSystemExplorer() {
 
   const nodes = [...explorer.querySelectorAll("[data-system-index]")];
   const panel = explorer.querySelector(".system-panel");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let currentIndex = 0;
+  let visible = false;
+  let paused = false;
+  let timer = 0;
+
+  const stop = () => {
+    window.clearTimeout(timer);
+    timer = 0;
+  };
 
   const renderStep = (index) => {
     const step = project.systemFlow[index];
     if (!step || !panel) return;
+    currentIndex = index;
 
     nodes.forEach((node) => {
       node.classList.toggle("is-active", Number(node.dataset.systemIndex) === index);
     });
 
+    panel.classList.remove("is-changing");
     panel.innerHTML = `
       <p class="system-panel-eyebrow">${step.eyebrow}</p>
       <h3>${step.title}</h3>
@@ -214,14 +193,61 @@ function setupSystemExplorer() {
         ${step.stack.map((item) => `<span>${item}</span>`).join("")}
       </div>
     `;
+    requestAnimationFrame(() => panel.classList.add("is-changing"));
+  };
+
+  const queue = () => {
+    stop();
+    if (reduceMotion || paused || !visible || document.hidden) return;
+    timer = window.setTimeout(() => {
+      renderStep((currentIndex + 1) % nodes.length);
+      queue();
+    }, 2600);
+  };
+
+  const pause = () => {
+    paused = true;
+    stop();
+  };
+
+  const resume = () => {
+    paused = false;
+    queue();
   };
 
   nodes.forEach((node) => {
     const index = Number(node.dataset.systemIndex);
-    node.addEventListener("click", () => renderStep(index));
-    node.addEventListener("mouseenter", () => renderStep(index));
+    node.addEventListener("click", () => {
+      renderStep(index);
+      queue();
+    });
+    node.addEventListener("mouseenter", () => {
+      pause();
+      renderStep(index);
+    });
+    node.addEventListener("mouseleave", resume);
   });
+  explorer.addEventListener("focusin", pause);
+  explorer.addEventListener("focusout", () => {
+    window.setTimeout(() => {
+      if (!explorer.contains(document.activeElement)) resume();
+    }, 0);
+  });
+  document.addEventListener("visibilitychange", queue);
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) queue();
+      else stop();
+    },
+    { threshold: 0.2 }
+  );
+
+  renderStep(0);
+  observer.observe(explorer);
 }
+
 
 async function setupMermaidDiagrams() {
   const diagrams = [...document.querySelectorAll(".mermaid")];

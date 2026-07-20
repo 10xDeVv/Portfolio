@@ -252,10 +252,11 @@ a { color: inherit; text-decoration: none; }
 
 .portrait-card {
   position: relative;
-  min-height: 320px;
+  aspect-ratio: 1;
+  min-height: 0;
   margin: 0;
   overflow: hidden;
-  border-radius: 999px 999px 14px 14px;
+  border-radius: 16px;
   background: var(--paper-strong);
 }
 
@@ -266,7 +267,7 @@ a { color: inherit; text-decoration: none; }
   height: 100%;
   object-fit: cover;
   object-position: 52% 15%;
-  transform: scale(1.08);
+  transform: scale(1.03);
   transform-origin: 52% 15%;
 }
 
@@ -280,11 +281,13 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 220ms ease, -webkit-mask-image 120ms ease, mask-image 120ms ease;
 }
 
-.portrait-card:hover .portrait-color,
-.portrait-card.is-coloring .portrait-color {
-  opacity: 1;
-  -webkit-mask-image: radial-gradient(ellipse var(--portrait-rx, 140px) var(--portrait-ry, 140px) at var(--portrait-x, 50%) var(--portrait-y, 50%), #000 0 48%, rgba(0, 0, 0, 0.78) 62%, transparent 100%);
-  mask-image: radial-gradient(ellipse var(--portrait-rx, 140px) var(--portrait-ry, 140px) at var(--portrait-x, 50%) var(--portrait-y, 50%), #000 0 48%, rgba(0, 0, 0, 0.78) 62%, transparent 100%);
+@media (min-width: 721px) and (hover: hover) and (pointer: fine) {
+  .portrait-card:hover .portrait-color,
+  .portrait-card.is-coloring .portrait-color {
+    opacity: 1;
+    -webkit-mask-image: radial-gradient(ellipse var(--portrait-rx, 140px) var(--portrait-ry, 140px) at var(--portrait-x, 50%) var(--portrait-y, 50%), #000 0 48%, rgba(0, 0, 0, 0.78) 62%, transparent 100%);
+    mask-image: radial-gradient(ellipse var(--portrait-rx, 140px) var(--portrait-ry, 140px) at var(--portrait-x, 50%) var(--portrait-y, 50%), #000 0 48%, rgba(0, 0, 0, 0.78) 62%, transparent 100%);
+  }
 }
 
 .hero-position {
@@ -557,21 +560,47 @@ a { color: inherit; text-decoration: none; }
 .contact-card { padding-bottom: 0; }
 .contact-intro { max-width: 640px; margin: 18px 0 0; color: var(--ink-soft); font-size: 17px; line-height: 1.48; }
 
-.contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 760px; margin-top: 26px; }
+.contact-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 840px;
+  margin-top: 26px;
+  padding: 20px;
+  border: 1px solid rgba(232, 240, 252, 0.16);
+  border-radius: 16px;
+  background: rgba(15, 17, 22, 0.76);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
 .form-field { display: flex; flex-direction: column; gap: 7px; }
 .form-field:nth-child(3),
 .contact-form-error { grid-column: 1 / -1; }
 .form-field label { color: var(--ink-soft); font-size: 13px; font-weight: 700; }
 .input,
-.textarea { width: 100%; border: 1px solid var(--line); border-radius: var(--radius-tight); background: rgba(255, 255, 255, 0.34); color: var(--ink); outline: none; padding: 11px 13px; }
+.textarea {
+  width: 100%;
+  border: 1px solid rgba(232, 240, 252, 0.24);
+  border-radius: var(--radius-tight);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+  outline: none;
+  padding: 11px 13px;
+}
+.input::placeholder,
+.textarea::placeholder { color: rgba(241, 245, 252, 0.48); }
 .input:focus,
 .textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
 .textarea { min-height: 120px; resize: vertical; }
 .submit-button,
-.resume-link { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid var(--ink); border-radius: 999px; font-size: 13px; font-weight: 800; cursor: pointer; }
-.submit-button { background: var(--ink); color: var(--white); }
-.resume-link { border-color: var(--line-strong); background: transparent; color: var(--ink); }
-.contact-form-error { margin: 0; color: #a9172d; font-size: 14px; font-weight: 650; }
+.resume-link { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid var(--ink); border-radius: 999px; font-size: 13px; font-weight: 800; cursor: pointer; transition: background var(--ease), border-color var(--ease), color var(--ease), transform var(--ease); }
+.submit-button { border-color: var(--accent); background: var(--accent); color: #071012; }
+.submit-button:hover,
+.submit-button:focus-visible { background: #9be7dd; border-color: #9be7dd; transform: translateY(-1px); }
+.resume-link { border-color: rgba(232, 240, 252, 0.3); background: rgba(255, 255, 255, 0.035); color: var(--ink); }
+.resume-link:hover,
+.resume-link:focus-visible { border-color: var(--accent); color: var(--accent); }
+.contact-form-error { margin: 0; color: #ff9baa; font-size: 14px; font-weight: 650; }
 
 .footer { width: var(--page); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; margin: 0 auto; padding: 38px 0 28px; color: var(--ink-soft); font-size: 13px; }
 .footer > p { margin: 0; }
@@ -838,7 +867,7 @@ a { color: inherit; text-decoration: none; }
   .editorial-hero { display: flex; flex-direction: column; align-items: stretch; gap: 28px; padding-top: 82px; }
   .hero-title { font-size: clamp(50px, 15vw, 76px); }
   .hero-lede { font-size: 18px; }
-  .portrait-card { min-height: 430px; max-height: 560px; order: 2; }
+  .portrait-card { aspect-ratio: 1; min-height: 0; max-height: none; order: 2; }
   .hero-position { order: 3; }
   .hero-contact-links { align-items: stretch; }
   .hero-primary-cta { flex: 1 1 100%; }
@@ -953,9 +982,9 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 96 96' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.62'/%3E%3C/svg%3E");
   background-size: 120px 120px;
   content: "";
-  opacity: 0.025;
+  opacity: 0.06;
   pointer-events: none;
-  mix-blend-mode: soft-light;
+  mix-blend-mode: normal;
 }
 
 .app,
@@ -1087,9 +1116,9 @@ body::after {
   inset: 0;
   width: 100vw;
   height: 100vh;
-  opacity: 0.028;
+  opacity: 0.072;
   pointer-events: none;
-  mix-blend-mode: soft-light;
+  mix-blend-mode: normal;
 }
 
 body.has-ambient-grain::after { opacity: 0; }

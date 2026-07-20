@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=52";
-import { appTemplate } from "./components.js?v=52";
+import { content } from "./content.js?v=54";
+import { appTemplate } from "./components.js?v=54";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -572,7 +572,7 @@ function setupElasticEffects() {
 
   const portraitCard = document.querySelector(".portrait-card");
 
-  if (portraitCard) {
+  if (portraitCard && window.matchMedia("(min-width: 721px) and (hover: hover) and (pointer: fine)").matches) {
     createElasticTracker(portraitCard, {
       speed: 0.13,
       maxStretch: 0.22,

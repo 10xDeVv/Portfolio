@@ -1116,7 +1116,7 @@ body::after {
   inset: 0;
   width: 100vw;
   height: 100vh;
-  opacity: 0.072;
+  opacity: 0.06;
   pointer-events: none;
   mix-blend-mode: normal;
 }

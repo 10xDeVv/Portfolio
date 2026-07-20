@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=54";
-import { appTemplate } from "./components.js?v=54";
+import { content } from "./content.js?v=55";
+import { appTemplate } from "./components.js?v=55";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -93,7 +93,7 @@ function setupAmbientGrain() {
   };
 
   const resize = () => {
-    const scale = 3;
+    const scale = 1.5;
     const width = Math.max(160, Math.ceil(window.innerWidth / scale));
     const height = Math.max(120, Math.ceil(window.innerHeight / scale));
     canvas.width = width;
@@ -104,7 +104,7 @@ function setupAmbientGrain() {
   const draw = () => {
     const pixels = imageData.data;
     for (let index = 0; index < pixels.length; index += 4) {
-      const value = 46 + (random() >> 1);
+      const value = 66 + (random() >> 2);
       pixels[index] = value;
       pixels[index + 1] = value;
       pixels[index + 2] = value;

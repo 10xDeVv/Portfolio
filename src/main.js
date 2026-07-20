@@ -1,10 +1,11 @@
-import { content } from "./content.js?v=51";
-import { appTemplate } from "./components.js?v=51";
+import { content } from "./content.js?v=52";
+import { appTemplate } from "./components.js?v=52";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
 
 const root = document.querySelector("#app");
+let ambientGrainCleanup = () => {};
 
 function render() {
   root.innerHTML = appTemplate();
@@ -13,6 +14,7 @@ function render() {
     document.body.classList.add("is-ready");
   });
 
+  setupAmbientGrain();
   setupReveal();
   setupAnchorLinks();
   setupElasticEffects();
@@ -62,6 +64,103 @@ function setupReveal() {
   }
 
   revealTargets.forEach((target) => target.classList.add("is-visible"));
+}
+
+function setupAmbientGrain() {
+  ambientGrainCleanup();
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (reducedMotion.matches) return;
+
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { alpha: true, desynchronized: true });
+  if (!context) return;
+
+  canvas.className = "ambient-grain";
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.prepend(canvas);
+  document.body.classList.add("has-ambient-grain");
+
+  let imageData;
+  let timer = 0;
+  let running = false;
+  let seed = (Date.now() ^ Math.floor(performance.now() * 1000)) >>> 0;
+  let frame = 0;
+
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed >>> 24;
+  };
+
+  const resize = () => {
+    const scale = 3;
+    const width = Math.max(160, Math.ceil(window.innerWidth / scale));
+    const height = Math.max(120, Math.ceil(window.innerHeight / scale));
+    canvas.width = width;
+    canvas.height = height;
+    imageData = context.createImageData(width, height);
+  };
+
+  const draw = () => {
+    const pixels = imageData.data;
+    for (let index = 0; index < pixels.length; index += 4) {
+      const value = 46 + (random() >> 1);
+      pixels[index] = value;
+      pixels[index + 1] = value;
+      pixels[index + 2] = value;
+      pixels[index + 3] = 255;
+    }
+    context.putImageData(imageData, 0, 0);
+    canvas.dataset.frame = String(++frame);
+  };
+
+  const stop = () => {
+    running = false;
+    window.clearTimeout(timer);
+    timer = 0;
+  };
+
+  const start = () => {
+    if (running || document.hidden || reducedMotion.matches) return;
+    running = true;
+
+    const tick = () => {
+      if (!running || document.hidden || reducedMotion.matches) {
+        stop();
+        return;
+      }
+      draw();
+      timer = window.setTimeout(tick, 333);
+    };
+
+    tick();
+  };
+
+  const onVisibilityChange = () => {
+    if (document.hidden) stop();
+    else start();
+  };
+
+  const onMotionChange = () => {
+    if (reducedMotion.matches) ambientGrainCleanup();
+    else setupAmbientGrain();
+  };
+
+  resize();
+  start();
+  window.addEventListener("resize", resize, { passive: true });
+  document.addEventListener("visibilitychange", onVisibilityChange);
+  reducedMotion.addEventListener("change", onMotionChange);
+
+  ambientGrainCleanup = () => {
+    stop();
+    window.removeEventListener("resize", resize);
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+    reducedMotion.removeEventListener("change", onMotionChange);
+    canvas.remove();
+    document.body.classList.remove("has-ambient-grain");
+    ambientGrainCleanup = () => {};
+  };
 }
 
 function setupAnchorLinks() {

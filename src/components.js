@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=55";
+import { content } from "./content.js?v=56";
 
 const {
   contact,
@@ -235,7 +235,6 @@ function ProjectDetailPage(project) {
         <a class="back-link" href="#work" aria-label="Back to selected projects">← Selected work</a>
         ${ProjectThesis(project, detailLinks)}
         ${ProjectExecutiveSummary(project)}
-        ${ProjectQuickNavigation(project)}
         ${ProjectEvidenceSurface(project)}
         ${ProjectStorySection(project)}
         ${ProjectMetricList(project.metrics)}
@@ -296,32 +295,6 @@ function firstSentence(value) {
   return end === -1 ? value : value.slice(0, end + 1);
 }
 
-function ProjectQuickNavigation(project) {
-  const sections = [
-    { href: "#project-brief", label: "15-second read" },
-    { href: "#project-evidence", label: "Evidence surface" },
-    { href: "#project-story", label: caseFocus[project.slug] || "The build" },
-    project.metrics?.length && { href: "#project-metrics", label: "Repository facts" },
-    project.systemFlow?.length && { href: "#project-system", label: "Technical system" },
-    project.routeSimulation?.length && { href: "#project-simulation", label: "Execution trace" },
-    (project.engineeringDecisions?.length || project.failureModes?.length) && {
-      href: "#project-decisions",
-      label: "Decision log",
-    },
-    [project.architecture, project.differentiators, project.features, project.impact].some((items) => items?.length) && {
-      href: "#project-appendix",
-      label: "Evidence appendix",
-    },
-    project.resumeBullets?.length && { href: "#project-contributions", label: "Technical contribution" },
-  ].filter(Boolean);
-
-  return `
-    <nav class="case-rail" aria-label="${project.title} case file sections">
-      <p>Case file index</p>
-      <ol>${sections.map((section) => `<li><a href="${section.href}">${section.label}</a></li>`).join("")}</ol>
-    </nav>
-  `;
-}
 
 function ProjectEvidenceSurface(project) {
   return `
@@ -464,7 +437,7 @@ function ProjectSystemSection(project) {
           <div class="system-stack">${active.stack.map((item) => `<span>${item}</span>`).join("")}</div>
         </article>
       </div>
-      <details class="case-disclosure architecture-disclosure">
+      <details class="case-disclosure architecture-disclosure" open>
         <summary><span>Architecture map</span><small>01 interactive map</small></summary>
         <div class="disclosure-body">${ProjectArchitectureMap(project)}${project.architectureNote ? `<p class="architecture-note">${project.architectureNote}</p>` : ""}</div>
       </details>
@@ -481,7 +454,7 @@ function ProjectSimulationSection(project) {
         <p class="section-kicker">Execution trace</p>
         <h2 id="simulation-title">${project.simulationTitle || "What happens after the request starts"}</h2>
       </header>
-      <details class="case-disclosure">
+      <details class="case-disclosure lifecycle-disclosure" open>
         <summary><span>Request lifecycle</span><small>${String(project.routeSimulation.length).padStart(2, "0")} steps</small></summary>
         <div class="disclosure-body">
           ${

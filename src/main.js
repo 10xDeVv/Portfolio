@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=55";
-import { appTemplate } from "./components.js?v=55";
+import { content } from "./content.js?v=56";
+import { appTemplate } from "./components.js?v=56";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -459,15 +459,22 @@ function setupDiagramPan() {
 }
 
 function setupResponsiveProjectDetails() {
-  let compact = false;
+  let compact;
 
   const apply = () => {
     const nextCompact = window.matchMedia("(max-width: 900px)").matches;
-    if (nextCompact && !compact) {
+    if (nextCompact === compact) return;
+
+    document.querySelectorAll(".architecture-disclosure, .lifecycle-disclosure").forEach((disclosure) => {
+      disclosure.open = !nextCompact;
+    });
+
+    if (nextCompact) {
       document.querySelectorAll(".decision-drawer").forEach((drawer) => {
         drawer.open = false;
       });
     }
+
     compact = nextCompact;
   };
 

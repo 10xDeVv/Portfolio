@@ -1116,11 +1116,13 @@ body::after {
   inset: 0;
   width: 100vw;
   height: 100vh;
-  opacity: 1;
+  opacity: 0.06;
   pointer-events: none;
   mix-blend-mode: normal;
 }
 
-body.has-ambient-grain::before,
 body.has-ambient-grain::after { opacity: 0; }
 
+@media (prefers-reduced-motion: reduce) {
+  .ambient-grain { display: none; }
+}

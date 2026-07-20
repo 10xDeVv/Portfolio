@@ -1,4 +1,4 @@
-import { content } from "./content.js?v=56";
+import { content } from "./content.js?v=55";
 
 const {
   contact,

@@ -1,5 +1,5 @@
-import { content } from "./content.js?v=56";
-import { appTemplate } from "./components.js?v=56";
+import { content } from "./content.js?v=55";
+import { appTemplate } from "./components.js?v=55";
 
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
@@ -70,8 +70,10 @@ function setupAmbientGrain() {
   ambientGrainCleanup();
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (reducedMotion.matches) return;
+
   const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d", { alpha: false, desynchronized: true });
+  const context = canvas.getContext("2d", { alpha: true, desynchronized: true });
   if (!context) return;
 
   canvas.className = "ambient-grain";
@@ -80,7 +82,6 @@ function setupAmbientGrain() {
   document.body.classList.add("has-ambient-grain");
 
   let imageData;
-  let basePixels;
   let timer = 0;
   let running = false;
   let seed = (Date.now() ^ Math.floor(performance.now() * 1000)) >>> 0;
@@ -91,13 +92,6 @@ function setupAmbientGrain() {
     return seed >>> 24;
   };
 
-  const falloff = (x, y, centerX, centerY, radiusX, radiusY) => {
-    const distance = ((x - centerX) / radiusX) ** 2 + ((y - centerY) / radiusY) ** 2;
-    if (distance >= 1) return 0;
-    const value = 1 - distance;
-    return value * value;
-  };
-
   const resize = () => {
     const scale = 1.5;
     const width = Math.max(160, Math.ceil(window.innerWidth / scale));
@@ -105,34 +99,16 @@ function setupAmbientGrain() {
     canvas.width = width;
     canvas.height = height;
     imageData = context.createImageData(width, height);
-    basePixels = new Uint8ClampedArray(width * height * 3);
-
-    let baseIndex = 0;
-    for (let row = 0; row < height; row += 1) {
-      const y = row / Math.max(height - 1, 1);
-      for (let column = 0; column < width; column += 1) {
-        const x = column / Math.max(width - 1, 1);
-        const purple = falloff(x, y, 0.08, -0.02, 0.72, 0.7);
-        const teal = falloff(x, y, 1.05, 0.15, 0.85, 0.9);
-
-        basePixels[baseIndex] = 9 + Math.round(purple * 12 + teal);
-        basePixels[baseIndex + 1] = 10 + Math.round(purple * 10 + teal * 12);
-        basePixels[baseIndex + 2] = 13 + Math.round(purple * 25 + teal * 14);
-        baseIndex += 3;
-      }
-    }
   };
 
   const draw = () => {
     const pixels = imageData.data;
-    let baseIndex = 0;
     for (let index = 0; index < pixels.length; index += 4) {
-      const dither = (random() >> 5) - 4;
-      pixels[index] = basePixels[baseIndex] + dither;
-      pixels[index + 1] = basePixels[baseIndex + 1] + dither;
-      pixels[index + 2] = basePixels[baseIndex + 2] + dither;
+      const value = 66 + (random() >> 2);
+      pixels[index] = value;
+      pixels[index + 1] = value;
+      pixels[index + 2] = value;
       pixels[index + 3] = 255;
-      baseIndex += 3;
     }
     context.putImageData(imageData, 0, 0);
     canvas.dataset.frame = String(++frame);
@@ -145,9 +121,7 @@ function setupAmbientGrain() {
   };
 
   const start = () => {
-    if (running || document.hidden) return;
-    draw();
-    if (reducedMotion.matches) return;
+    if (running || document.hidden || reducedMotion.matches) return;
     running = true;
 
     const tick = () => {
@@ -159,7 +133,7 @@ function setupAmbientGrain() {
       timer = window.setTimeout(tick, 333);
     };
 
-    timer = window.setTimeout(tick, 333);
+    tick();
   };
 
   const onVisibilityChange = () => {
@@ -168,12 +142,8 @@ function setupAmbientGrain() {
   };
 
   const onMotionChange = () => {
-    if (reducedMotion.matches) {
-      stop();
-      draw();
-    } else {
-      start();
-    }
+    if (reducedMotion.matches) ambientGrainCleanup();
+    else setupAmbientGrain();
   };
 
   resize();

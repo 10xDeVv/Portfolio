@@ -24,7 +24,7 @@ const caseFocus = {
   wayward: "Route quality is a contract",
   lazydrop: "The control plane, not the file pipe",
   wheredidiapply: "The privacy boundary",
-  spotlight: "Ownership moves to the backend",
+  audire: "Creative agency without false certainty",
 };
 
 const renderLinks = (links = [], className = "action-links") => {
@@ -141,10 +141,10 @@ function ProjectFeature(project, index) {
   return `
     <li>
       <article class="project-feature" data-project="${project.slug}">
-        <a class="project-feature-evidence" href="#project/${project.slug}" aria-label="Open ${project.title} case study">
+        <a class="project-feature-evidence" href="#project/${project.slug}" aria-label="Explore ${project.title}">
           <span class="project-index">${String(index + 1).padStart(2, "0")}</span>
           ${ProjectFeatureVisual(project)}
-          <span class="project-evidence-label">Open case file ${arrow}</span>
+          <span class="project-evidence-label">Explore ${project.title} ${arrow}</span>
         </a>
         <div class="project-feature-copy">
           <p class="project-eyebrow">${project.category}</p>
@@ -156,9 +156,9 @@ function ProjectFeature(project, index) {
             ${project.tags.slice(0, 5).map((tag) => `<span>${tag}</span>`).join("")}
           </div>
           <div class="project-feature-links">
-            <a class="text-link" href="#project/${project.slug}">Read the case file ${arrow}</a>
+            <a class="text-link" href="#project/${project.slug}">Technical breakdown ${arrow}</a>
             ${externalLinks
-              .map((link) => `<a class="text-link muted-link" href="${link.href}"${linkAttrs(link.href)}>${link.label}</a>`)
+              .map((link) => `<a class="text-link muted-link" href="${link.href}"${linkAttrs(link.href)}>Live site</a>`)
               .join("")}
           </div>
         </div>
@@ -168,8 +168,6 @@ function ProjectFeature(project, index) {
 }
 
 function ProjectFeatureVisual(project) {
-  if (project.slug === "spotlight") return SpotlightOwnershipMap("compact");
-
   return `<img src="${project.image}" alt="${project.title} product evidence" />`;
 }
 
@@ -250,12 +248,13 @@ function ProjectDetailPage(project) {
 
 function ProjectThesis(project, detailLinks) {
   const outcome = project.impact?.[0] || project.features?.[0];
+  const displayTitle = project.title.replace(/([a-z])(?=[A-Z])/g, "$1<wbr>");
 
   return `
     <header class="case-thesis" id="case-thesis">
       <div class="case-thesis-copy">
         <p class="project-eyebrow">Case file · ${project.category}</p>
-        <h1>${project.title}</h1>
+        <h1>${displayTitle}</h1>
         <p class="case-headline">${project.headline}</p>
         <div class="project-tags detail-tags" aria-label="${project.title} technologies">
           ${project.tags.map((tag) => `<span>${tag}</span>`).join("")}
@@ -297,10 +296,19 @@ function firstSentence(value) {
 
 
 function ProjectEvidenceSurface(project) {
+  const demo = project.demoVideo
+    ? `
+        <video class="evidence-demo-video" muted playsinline preload="metadata" poster="${project.image}" aria-hidden="true" tabindex="-1">
+          <source src="${project.demoVideo.src}" type="video/mp4" />
+        </video>
+      `
+    : "";
+
   return `
     <figure class="case-evidence-surface" id="project-evidence">
-      <div class="evidence-surface-art">
-        ${project.slug === "spotlight" ? SpotlightOwnershipMap() : `<img src="${project.image}" alt="${project.title} product evidence" />`}
+      <div class="evidence-surface-art${project.demoVideo ? " has-demo-loop" : ""}"${project.demoVideo ? ' data-demo-loop' : ""}>
+        <img src="${project.image}" alt="${project.title} product evidence" />
+        ${demo}
       </div>
       <figcaption>${EvidenceCaption(project)}</figcaption>
     </figure>
@@ -317,24 +325,9 @@ function EvidenceCaption(project) {
   if (project.slug === "wheredidiapply") {
     return "Evidence surface: Gmail OAuth remains browser-held; the backend receives only snippets for in-memory classification and the editable dashboard stays local.";
   }
-  return "Ownership map: Spotlight deliberately uses a system map instead of unrelated image proof, showing behavior move from client/direct data access to server-owned APIs and persistence.";
+  return "Evidence surface: Audire turns a short musical idea into three clearly different practice paths, with an explicit note that the response is creative guidance rather than a musical verdict.";
 }
 
-function SpotlightOwnershipMap(compact = "") {
-  return `
-    <div class="ownership-map ${compact}" aria-label="Spotlight ownership map">
-      <div class="ownership-legacy"><span>Before</span><strong>Mobile client + direct Supabase table access</strong></div>
-      <div class="ownership-arrow" aria-hidden="true">→</div>
-      <div class="ownership-now">
-        <span>After</span>
-        <div><strong>Expo / React Native</strong><small>REST + STOMP</small></div>
-        <div><strong>Spring Boot domains</strong><small>profiles, discovery, activities, chat, safety, notifications</small></div>
-        <div><strong>PostgreSQL + Flyway</strong><small>server-owned product data</small></div>
-        <div><strong>Supabase Auth</strong><small>identity remains separate</small></div>
-      </div>
-    </div>
-  `;
-}
 
 function ProjectStorySection(project) {
   const sections = [

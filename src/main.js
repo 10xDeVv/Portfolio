@@ -6,8 +6,10 @@ document.title = content.site.title;
 
 const root = document.querySelector("#app");
 let ambientGrainCleanup = () => {};
+let demoLoopCleanup = () => {};
 
 function render() {
+  demoLoopCleanup();
   root.innerHTML = appTemplate();
 
   requestAnimationFrame(() => {
@@ -16,6 +18,7 @@ function render() {
 
   setupAmbientGrain();
   setupReveal();
+  setupDemoLoops();
   setupAnchorLinks();
   setupElasticEffects();
   setupMenu();
@@ -64,6 +67,115 @@ function setupReveal() {
   }
 
   revealTargets.forEach((target) => target.classList.add("is-visible"));
+}
+
+function setupDemoLoops() {
+  const surfaces = [...document.querySelectorAll("[data-demo-loop]")];
+  if (!surfaces.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const records = surfaces
+    .map((surface) => ({ surface, video: surface.querySelector(".evidence-demo-video"), timer: 0, visible: false, requested: false, playing: false }))
+    .filter((record) => record.video);
+
+  const clearTimer = (record) => {
+    window.clearTimeout(record.timer);
+    record.timer = 0;
+  };
+
+  const showStill = (record) => {
+    clearTimer(record);
+    record.requested = false;
+    record.playing = false;
+    record.surface.classList.remove("is-playing");
+    record.video.pause();
+    record.video.currentTime = 0;
+  };
+
+  const queuePlayback = (record, delay = 1000) => {
+    clearTimer(record);
+    if (!record.visible || document.hidden || reducedMotion.matches || record.requested || record.playing) return;
+    record.timer = window.setTimeout(() => play(record), delay);
+  };
+
+  const play = (record) => {
+    if (!record.visible || document.hidden || reducedMotion.matches || record.requested || record.playing) return;
+
+    record.requested = true;
+    record.video.muted = true;
+    record.video.currentTime = 0;
+    record.video
+      .play()
+      .then(() => {
+        if (!record.visible || document.hidden || reducedMotion.matches) {
+          showStill(record);
+          return;
+        }
+
+        record.playing = true;
+        record.surface.classList.add("is-playing");
+      })
+      .catch(() => showStill(record));
+  };
+
+  records.forEach((record) => {
+    record.onEnded = () => {
+      record.surface.classList.remove("is-playing");
+      record.requested = false;
+      record.playing = false;
+      record.video.pause();
+      record.video.currentTime = 0;
+      queuePlayback(record);
+    };
+    record.onHover = () => play(record);
+    record.video.addEventListener("ended", record.onEnded);
+    record.surface.addEventListener("pointerenter", record.onHover);
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const record = records.find((candidate) => candidate.surface === entry.target);
+        if (!record) return;
+
+        record.visible = entry.isIntersecting;
+        if (record.visible) queuePlayback(record);
+        else showStill(record);
+      });
+    },
+    { threshold: 0.35 }
+  );
+
+  records.forEach((record) => observer.observe(record.surface));
+
+  const onVisibilityChange = () => {
+    records.forEach((record) => {
+      if (document.hidden) showStill(record);
+      else queuePlayback(record);
+    });
+  };
+
+  const onMotionChange = () => {
+    records.forEach((record) => {
+      if (reducedMotion.matches) showStill(record);
+      else queuePlayback(record);
+    });
+  };
+
+  document.addEventListener("visibilitychange", onVisibilityChange);
+  reducedMotion.addEventListener("change", onMotionChange);
+
+  demoLoopCleanup = () => {
+    observer.disconnect();
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+    reducedMotion.removeEventListener("change", onMotionChange);
+    records.forEach((record) => {
+      record.video.removeEventListener("ended", record.onEnded);
+      record.surface.removeEventListener("pointerenter", record.onHover);
+      showStill(record);
+    });
+    demoLoopCleanup = () => {};
+  };
 }
 
 function setupAmbientGrain() {

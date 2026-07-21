@@ -108,6 +108,7 @@ export const content = {
         "A full-stack scenic route platform that turns a start point, time budget, and vibe into legal drivable loop options scored against precomputed H3 scenic intelligence.",
       category: "Geospatial Route Platform",
       image: "./public/assets/project-wayward.png",
+      demoVideo: { src: "./public/assets/demo-wayward.mp4" },
       url: "https://usewayward.app",
       proof: "Kafka + OSRM + PostGIS scenic route engine · 27 route-quality scenarios · 211k H3 scenic tiles",
       links: [
@@ -402,6 +403,7 @@ sequenceDiagram
         "A production-ready web platform for moving files between devices with QR/code pairing, WebSocket coordination, temporary object storage, Supabase auth, and Stripe billing.",
       category: "Realtime File Transfer",
       image: "./public/assets/project-lazydrop.png",
+      demoVideo: { src: "./public/assets/demo-lazydrop.mp4" },
       url: "https://lazydrop.app",
       proof: "Realtime file transfer with signed uploads and Stripe plans · WebSocket sessions · cleanup jobs",
       links: [
@@ -964,49 +966,204 @@ sequenceDiagram
       ],
     },
     {
-      slug: "spotlight",
+      slug: "audire",
       featuredRank: 4,
-      title: "Spotlight",
-      headline: "Spring Boot backend migration for a student social app with discovery, activities, safety, and chat.",
+      title: "Audire",
+      headline: "A responsible-AI music practice tool that returns creative directions, audible comparisons, and a practice loop without pretending to be the final artistic authority.",
       description:
-        "A backend migration that moved Spotlight from a frontend-heavy Supabase-direct model to server-owned APIs, PostgreSQL persistence, and WebSocket chat.",
-      category: "Mobile Backend Migration",
-      url: "https://github.com/10xDeVv",
-      proof: "Spring Boot backend migration · PostgreSQL-owned app data · STOMP realtime chat",
+        "A full-stack music-learning prototype that turns a musical idea into three explainable directions, structured feedback, audible chord comparisons, and a guided practice plan.",
+      category: "Responsible AI Music Learning",
+      image: "./public/assets/project-audire.png",
+      url: "https://tinyurl.com/2cv9q74z",
+      proof: "Next.js + FastAPI + Pydantic structured output · 11 deterministic theory cases · 99 contract checks",
       links: [
-        { label: "GitHub", href: "https://github.com/10xDeVv" },
-        { label: "Case Study", href: "#project/spotlight" },
+        { label: "Live Demo", href: "https://tinyurl.com/2cv9q74z" },
+        { label: "Case Study", href: "#project/audire" },
       ],
-      tags: ["Spring Boot", "PostgreSQL", "Expo", "Supabase", "STOMP"],
+      tags: ["Next.js", "FastAPI", "Pydantic", "OpenAI", "Tonal", "Web Audio", "Docker"],
       overview:
-        "Spotlight is a React Native app for university students built around compatibility, lightweight messaging, weekly prompts, and real-world activities. I migrated the active app toward a backend-owned model while preserving Supabase Auth.",
+        "Audire begins with a musical idea instead of a score: the user supplies an intent, style, skill level, tonal center, and practice goal, then receives three clearly differentiated creative paths with their assumptions and tradeoffs made visible.",
       problem:
-        "The original app moved quickly, but too much product behavior lived in the client or raw Supabase table access. Matching, chat state, safety, notifications, unread counts, and feed logic needed a stronger server-side home.",
+        "Generative music feedback can sound authoritative even when a short prompt leaves its musical context ambiguous. A learning tool needs to encourage experimentation without presenting one suggestion as the correct artistic answer.",
       solution:
-        "I built a modular Spring Boot backend with domains for profile, discovery, activities, chat, weekly questions, notifications, safety, analytics, storage, and infrastructure. The mobile app calls REST APIs and STOMP WebSockets instead of coupling directly to database shape.",
+        "I built a typed Next.js-to-FastAPI workflow that validates the request, conditionally calls the OpenAI Responses API for structured guidance, normalizes a three-path response, and falls back to deterministic music-theory evaluation when a live response is unavailable.",
+      metrics: [
+        { value: "11", label: "deterministic music-theory cases" },
+        { value: "99", label: "backend contract checks" },
+        { value: "3", label: "creative paths per response" },
+        { value: "7", label: "piano samples in the listening lab" },
+      ],
+      systemEyebrow: "Guidance, not a verdict",
+      systemTitle: "How Audire turns an idea into an explainable practice direction",
+      systemFlow: [
+        {
+          eyebrow: "01 · Intent",
+          title: "Capture musical context",
+          detail: "The Next.js client collects an idea, style, skill level, optional tonal center, and practice goal instead of treating a free-text prompt as complete context.",
+          stack: ["Next.js", "TypeScript", "form state"],
+        },
+        {
+          eyebrow: "02 · Boundary",
+          title: "Validate the request",
+          detail: "FastAPI receives the request through a Pydantic contract, keeping the analysis boundary explicit before provider calls or deterministic evaluation begin.",
+          stack: ["FastAPI", "Pydantic", "typed request"],
+        },
+        {
+          eyebrow: "03 · Guidance",
+          title: "Produce three creative paths",
+          detail: "When configured, a server-only OpenAI Responses API call returns structured guidance. The normalized response preserves three alternatives, their assumptions, and their tradeoffs.",
+          stack: ["OpenAI Responses API", "structured output", "normalization"],
+        },
+        {
+          eyebrow: "04 · Fallback",
+          title: "Keep the learning loop usable",
+          detail: "A deterministic evaluator covers the same chord-fit and tonal-context boundaries when the provider is unavailable, so the interface does not replace uncertainty with a blank result.",
+          stack: ["music theory rules", "fallback response", "error mapping"],
+        },
+        {
+          eyebrow: "05 · Practice",
+          title: "Make the suggestion audible",
+          detail: "The listening lab provides chord comparison, piano samples, tempo control, and a metronome-backed practice plan so the musician can judge a path by ear.",
+          stack: ["Tonal", "Web Audio", "practice timer"],
+        },
+        {
+          eyebrow: "06 · Agency",
+          title: "Record the musician’s choice",
+          detail: "Keep, adapt, and reject reflections are stored locally, framing the output as a starting point and preserving the musician’s judgment as the final decision.",
+          stack: ["localStorage", "reflection", "user agency"],
+        },
+      ],
+      mermaidDiagram: `
+flowchart LR
+  C[Next.js client<br/>idea + controls] --> P[Caddy<br/>/api reverse proxy]
+  P --> A[FastAPI<br/>Pydantic validation]
+  A --> O{Live structured<br/>response available?}
+  O -->|Yes| R[OpenAI Responses API<br/>three creative paths]
+  O -->|No| D[Deterministic evaluator<br/>tonal context + chord fit]
+  R --> N[Normalize guidance<br/>assumptions + tradeoffs]
+  D --> N
+  N --> L[Listening lab<br/>Web Audio + practice plan]
+  N --> H[Local reflection<br/>keep / adapt / reject]
+      `,
+      architectureNote:
+        "The AI provider is deliberately server-side. The client receives a typed, normalized learning response rather than provider credentials or an unbounded model payload.",
+      diagramGuidance: {
+        architecture: "Start at the typed request boundary. The live and deterministic paths converge before the musician sees guidance, so provider availability does not decide whether the learning loop is usable.",
+        lifecycle: "The trace shows the user-facing contract: context first, explicit validation, structured guidance or a deterministic fallback, then audible comparison and local reflection.",
+      },
+      simulationTitle: "From a musical idea to a practice decision",
+      simulationLogTitle: "audire.practice.log",
+      lifecycleDiagram: `
+sequenceDiagram
+  participant U as Musician
+  participant N as Next.js client
+  participant A as FastAPI /analyze
+  participant O as OpenAI
+  U->>N: Enter idea and constraints
+  N->>A: POST /analyze
+  A->>A: Validate typed request
+  alt provider available
+    A->>O: Request structured guidance
+    O-->>A: Three creative paths
+  else provider unavailable
+    A->>A: Run deterministic evaluator
+  end
+  A-->>N: Normalized guidance
+  N->>N: Compare chords and practice
+  N->>N: Store keep / adapt / reject reflection
+      `,
+      routeSimulation: [
+        "Validate the musical idea and selected constraints",
+        "Establish tonal context and practice intent",
+        "Request structured guidance when a provider is configured",
+        "Map provider failures to explicit states or use deterministic evaluation",
+        "Normalize three creative paths with assumptions and tradeoffs",
+        "Render chord comparison, practice steps, and reflection controls",
+      ],
+      simulationResult: {
+        title: "Musician chooses the next move",
+        detail: "The result remains guidance: the learner can hear the alternatives, practice one, and keep, adapt, or reject the suggestion locally.",
+      },
+      engineeringDecisions: [
+        {
+          title: "Typed guidance over free-form model text",
+          why: "The interface needs exactly three comparable paths with visible assumptions and tradeoffs. A Pydantic response contract makes that presentation dependable.",
+          tradeoff: "The product gives up some open-ended output in exchange for a response shape that can be explained, rendered, and tested.",
+        },
+        {
+          title: "A deterministic path alongside the live provider",
+          why: "Learning should not silently stop when an AI provider is unconfigured or fails. The fallback covers core tonal-context and chord-fit behavior.",
+          tradeoff: "A rules-based response is narrower than live guidance, so the UI must present it as a bounded alternative rather than equivalent model creativity.",
+        },
+        {
+          title: "Three alternatives instead of a single recommendation",
+          why: "A short musical prompt is inherently underspecified. Presenting multiple paths makes uncertainty explicit and gives the musician room to choose.",
+          tradeoff: "The response takes more reading and comparison than a one-line answer, but avoids the false authority of a single “best” progression.",
+        },
+      ],
+      failureModes: [
+        "Invalid or incomplete musical context is rejected at the typed request boundary before analysis starts.",
+        "Provider authentication, quota, connection, and server failures map to explicit states instead of an opaque generic error.",
+        "Missing provider configuration falls back to deterministic tonal-context and chord-fit evaluation.",
+        "Ambiguous prompts return alternatives with assumptions and tradeoffs, not a claim that one musical choice is objectively correct.",
+      ],
+      architecture: [
+        {
+          title: "Server-owned AI boundary",
+          detail: "The Next.js client calls a FastAPI analysis endpoint through Caddy; the OpenAI Responses API key and provider invocation remain on the server.",
+        },
+        {
+          title: "Structured response contract",
+          detail: "Pydantic validates both analysis requests and the normalized response shape required by the three-path learning interface.",
+        },
+        {
+          title: "Audible evaluation loop",
+          detail: "Tonal utilities and Web Audio piano samples turn written suggestions into chord comparison and a metronome-backed practice experience.",
+        },
+      ],
+      differentiators: [
+        {
+          title: "Creative agency is product behavior",
+          detail: "Each result exposes assumptions, unknowns, and tradeoffs, then asks the learner to keep, adapt, or reject it instead of treating the model as a musical authority.",
+        },
+        {
+          title: "Reliability is visible",
+          detail: "A deterministic evaluator and explicit provider error mapping prevent the product from conflating a live-model outage with an artistic judgment.",
+        },
+        {
+          title: "The response is meant to be heard",
+          detail: "Chord comparison and practice controls let a musician test a direction by ear rather than accept text-only feedback.",
+        },
+      ],
       features: [
         {
-          title: "Backend-owned app data",
-          detail: "PostgreSQL and Flyway own the product schema while Supabase remains the identity provider.",
+          title: "Context-aware musical input",
+          detail: "The analysis form captures creative intent, style, ability, tonal center, and a practice goal before forming a request.",
         },
         {
-          title: "Realtime chat architecture",
-          detail: "STOMP WebSockets deliver typing and messages while persistence flows through backend-owned conversation APIs.",
+          title: "Three guided creative paths",
+          detail: "Every normalized response presents three differentiated directions with explicit reasoning and practice follow-through.",
         },
         {
-          title: "Safety and notification modules",
-          detail: "Blocked users, reports, push-token registration, and notification preferences are handled server-side.",
+          title: "Local reflection history",
+          detail: "Keep, adapt, and reject choices are recorded in the browser so the learner’s decision remains attached to the guidance loop.",
         },
       ],
       impact: [
         {
-          title: "Merged architecture direction",
-          detail: "The backend migration became the active direction for the project, with the previous main branch retained as legacy reference.",
+          title: "An AI feature with an inspectable contract",
+          detail: "The project couples a live structured-output path with deterministic theory coverage and 99 backend contract checks instead of presenting a model call as the entire product.",
         },
         {
-          title: "Faster product iteration",
-          detail: "Core ranking, safety, unread counts, and messaging behavior can evolve without pushing every change through mobile app releases.",
+          title: "A deliberately honest learning experience",
+          detail: "The interface turns ambiguous musical input into options a musician can hear and evaluate while keeping the final judgment with the learner.",
         },
+      ],
+      resumeBullets: [
+        "Built a full-stack AI music-learning prototype with a Next.js client, FastAPI analysis service, Pydantic request and response contracts, and a server-only OpenAI Responses API integration.",
+        "Designed three creative response paths with explicit assumptions and tradeoffs, plus keep/adapt/reject reflections that preserve user agency over generated guidance.",
+        "Implemented deterministic tonal-context and chord-fit evaluation as a fallback, with explicit handling for provider authentication, quota, connection, and server failures.",
+        "Created an audible learning loop with Tonal, Web Audio piano samples, chord comparison, tempo control, and a metronome-backed practice plan.",
       ],
     },
   ],

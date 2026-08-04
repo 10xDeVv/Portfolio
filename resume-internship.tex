@@ -1,0 +1,221 @@
+%-------------------------
+% Resume in LaTeX
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%-------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+% ---------- PACKAGES ----------
+\usepackage{latexsym}
+% \usepackage[empty]{fullpage}   % no longer needed
+\usepackage[
+    paper=letterpaper,
+    left=0.35in,
+    right=0.35in,
+    top=-.2in,
+    bottom=0.50in,
+    includeheadfoot
+]{geometry}                      % exact margins here
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+% ---------- FONT OPTIONS (commented samples) ----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+% ---------- PAGE STYLE ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% ---------- SECTION FORMAT ----------
+\titleformat{\section}{
+  \vspace{-4pt}\bfseries\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% ---------- PDF ACCESSIBILITY ----------
+\pdfgentounicode=1
+
+% ---------- CUSTOM COMMANDS ----------
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{%
+  \vspace{-2pt}\item
+    % was 0.97\textwidth → change to \textwidth
+    \begin{tabular*}{\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textbf{#2} \\
+      \textit{\small #3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}%
+}
+
+\newcommand{\resumeSubSubheading}[2]{%
+  \item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small #1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}%
+}
+
+\newcommand{\resumeProjectHeading}[1]{%
+  \item
+    \begin{tabular*}{\textwidth}{l}
+    \small #1 \\
+    \end{tabular*}\vspace{-7pt}%
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{
+  \begin{itemize}[leftmargin=0.35in, label={\textendash}]
+}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+% -------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%
+% -------------------------------------------
+
+\begin{document}
+
+% ---------- HEADING ----------
+\begin{center}
+    \textbf{\Huge \scshape Adebowale Adebayo} \\ \vspace{1pt}
+    \small 506-292-6644 $|$ 
+    \href{mailto:adebowale.712@unb.ca}{\underline{adebowale.712@unb.ca}} $|$ 
+    \href{https://linkedin.com/in/waally-xyz}{\underline{linkedin.com/in/waally-xyz}} $|$
+    \href{https://github.com/10xDeVv}{\underline{github.com/10xDeVv}}
+\end{center}
+
+% ---------- TECHNICAL SKILLS ----------
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+  \small{\item{
+    \textbf{Languages}{: Java, Go, TypeScript, JavaScript, Rust, SQL, VBA} \\
+    \textbf{Frameworks}{: Spring Boot, Next.js, React, Clerk, MapLibre GL} \\
+    \textbf{Data \& Infrastructure}{: PostgreSQL, PostGIS, Kafka, Redis, Docker, S3-Compatible Storage, GCP Cloud Run} \\
+    \textbf{Tools \& Practices}{: Git, Maven, Flyway, Microsoft Access, REST APIs, WebSockets, CI/CD}
+  }}
+\end{itemize}
+
+% ---------- EXPERIENCE ----------
+\section{Experience}
+\resumeSubHeadingListStart
+
+  \resumeSubheading
+    {Co-Founder \& Engineering Lead}{Apr. 2026 -- Present}
+    {Hack Atlantic}{Fredericton, NB}
+    \resumeItemListStart
+      \resumeItem{Leading development of an applicant-to-attendee platform that carries versioned applications through review and released decisions to \textbf{QR passes} and scanner-based checkpoint operations.}
+      \resumeItem{Architecting a Next.js UI and \textbf{Go/PostgreSQL} API boundary that keeps application state, authorization, decisions, and database access server-side while Clerk provides identity.}
+      \resumeItem{Designing revocable, hash-stored claim and QR credentials with \textbf{atomic checkpoint redemption} and explicit lifecycle transitions.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Database Systems Developer}{Apr. 2026 -- Present}
+    {Steel Plus Network}{Remote, Moncton, NB}
+    \resumeItemListStart
+      \resumeItem{Designing a normalized \textbf{Microsoft Access} rebate-management system for a fabricator-by-supplier workflow spanning Canadian and U.S. members.}
+      \resumeItem{Building calculated rebate queries and \textbf{Access/VBA} workflows that connect contracts, purchases, and exchange rates to supplier-specific rates, thresholds, CAD/USD conversion, and remittance-style payouts.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Founding Software Engineer}{Mar. 2026 -- Jul. 2026}
+    {Spotlight}{Canada}
+    \resumeItemListStart
+      \resumeItem{Built a \textbf{Spring Boot} migration branch for a React Native student-connection app, moving application data from direct Supabase table access to backend-owned APIs while retaining Supabase Auth.}
+      \resumeItem{Implemented server-owned \textbf{STOMP WebSocket chat} with unread counts, conversation state, moderation, and activity rules alongside backend domains for profiles, discovery, activities, prompts, notifications, safety, and analytics.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Teaching Assistant}{Sep. 2025 -- Present}
+    {University of New Brunswick --- Software Engineering}{Fredericton, NB}
+    \resumeItemListStart
+      \resumeItem{Mentor Introduction to Software Engineering lab students on project architecture, version control, Agile workflows, and implementation quality.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Database Systems Developer}{May 2025 -- Aug. 2025}
+    {Steel Plus Network --- Internship}{Remote, Moncton, NB}
+    \resumeItemListStart
+      \resumeItem{Replaced legacy Excel financial and customer workflows with \textbf{Microsoft Access}, reducing manual reporting time by \textbf{more than 50\%}.}
+      \resumeItem{Migrated, normalized, and optimized \textbf{thousands of records} for business reporting and day-to-day operational data management.}
+      \resumeItem{Built interactive forms and reports that let business teams manage operational data in the database rather than maintain spreadsheets.}
+    \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% ---------- PROJECTS ----------
+\section{Projects}
+\resumeSubHeadingListStart
+  \resumeProjectHeading
+      {\textbf{Breakpoint} $|$ \emph{Rust, React, TypeScript, MapLibre GL, Cargo}}
+      \resumeItemListStart
+        \resumeItem{Developing a private road-closure explorer that lets analysts select a road segment and inspect modeled changes to travel and essential-service access.}
+        \resumeItem{Building a \textbf{deterministic Rust network-analysis engine} with immutable directed graphs, turn-aware closures, SHA-256--pinned identities, FIFO-aware routing, and exact rational Frank--Wolfe reference assignment.}
+        \resumeItem{Hardening \textbf{reproducible model results} through content-addressed storage, hash-validated replay, atomic file publication, and explicit failure states that withhold comparisons for non-converged runs.}
+      \resumeItemListEnd
+  \resumeProjectHeading
+      {\textbf{Wayward} $|$ \emph{Spring Boot, Kafka, PostGIS, Redis, OSRM, H3, Next.js, Docker Compose}}
+      \resumeItemListStart
+        \resumeItem{Built Wayward, a scenic-driving-loop planner that combines \textbf{OSRM} road geometry and H3-sampled environmental data to turn a start point, time budget, and vibe into three route profiles.}
+        \resumeItem{Implemented progressive delivery through a \textbf{Spring Boot/Kafka} route pipeline that publishes an exact primary route before full details; the Next.js UI rejects stale updates and falls back to bounded polling.}
+        \resumeItem{Optimized the \textbf{1,500-tile scenic-cache lookup} with a local LRU, one Redis MGET, bulk SQL misses, and pipelined fills; a real-Redis benchmark measured \textbf{90 ms vs. 3.213 s} for batch versus serial reads.}
+      \resumeItemListEnd
+  \resumeProjectHeading
+      {\textbf{LazyDrop} $|$ \emph{Next.js, Spring Boot, PostgreSQL, STOMP WebSockets, S3-Compatible Storage, Stripe}}
+      \resumeItemListStart
+        \resumeItem{Built LazyDrop, a real-time session-based file-sharing platform where participants join temporary rooms by short code or QR link; a \textbf{two-phase signed-URL workflow} sends file bytes directly to object storage while the backend authorizes and confirms metadata.}
+        \resumeItem{Implemented per-session \textbf{STOMP/SockJS WebSockets} for peer, file, note, thumbnail, and session-lifecycle updates, publishing events after transaction commit and de-duplicating file state in React.}
+        \resumeItem{Hardened Stripe subscription processing with signature validation, a persistent \textbf{idempotent webhook ledger}, transactionally claimed leases, and a bounded \textbf{10-attempt retry policy}.}
+      \resumeItemListEnd
+  \resumeProjectHeading
+      {\textbf{WhereDidIApply} $|$ \emph{Next.js, TypeScript, Spring Boot, Gmail API, Gemini, GCP Cloud Run}}
+      \resumeItemListStart
+        \resumeItem{Built WhereDidIApply, a \textbf{Next.js/TypeScript} Gmail job tracker that turns inbox messages into a searchable dashboard with user-selected scan windows of \textbf{30--365 days}.}
+        \resumeItem{Designed a privacy-conscious Gmail flow that keeps \textbf{gmail.readonly} OAuth tokens in browser state, calls Gmail directly, and persists classified results only in \textbf{localStorage}.}
+        \resumeItem{Implemented a \textbf{Spring Boot} hybrid email parser with \textbf{32 deterministic classification patterns}, structured Gemini JSON extraction, and confidence-based result merging.}
+      \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+% ---------- EDUCATION ----------
+\section{Education}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {University of New Brunswick}{January 2024 -- Expected May 2028}
+    {Bachelor of Computer Science}{}
+    \resumeItemListStart
+        \resumeItem{Relevant Coursework: Database Systems, Software Engineering}
+      \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+% -------------------------------------------
+\end{document}

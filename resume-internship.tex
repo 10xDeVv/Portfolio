@@ -134,7 +134,7 @@
     {Co-Founder \& Engineering Lead}{Apr. 2026 -- Present}
     {Hack Atlantic}{Fredericton, NB}
     \resumeItemListStart
-      \resumeItem{Led development of an applicant-to-attendee platform that carried versioned applications through review and released decisions to \textbf{QR passes} and scanner-based checkpoint operations.}
+      \resumeItem{Led development of an \textbf{ATS platform} that managed \textbf{100+ applicants} through versioned submissions, review, decision release, QR-pass issuance, and scanner-based check-in.}
       \resumeItem{Architected a Next.js UI and \textbf{Go/PostgreSQL} API boundary that kept application state, authorization, decisions, and database access server-side while Clerk provided identity.}
       \resumeItem{Designed revocable, hash-stored claim and QR credentials with \textbf{atomic checkpoint redemption} and explicit lifecycle transitions.}
     \resumeItemListEnd
@@ -167,7 +167,7 @@
     {Steel Plus Network --- Internship}{Remote, Moncton, NB}
     \resumeItemListStart
       \resumeItem{Replaced legacy Excel financial and customer workflows with \textbf{Microsoft Access}, reducing manual reporting time by \textbf{more than 50\%}.}
-      \resumeItem{Migrated, normalized, and optimized \textbf{thousands of records} for business reporting and day-to-day operational data management.}
+      \resumeItem{Migrated, normalized, and optimized \textbf{1,000+ records} for business reporting and day-to-day operational data management.}
       \resumeItem{Built interactive forms and reports that let business teams manage operational data in the database rather than maintain spreadsheets.}
     \resumeItemListEnd
 
@@ -181,28 +181,28 @@
       \resumeItemListStart
         \resumeItem{Developed a private road-closure explorer that let analysts select a road segment and inspect modeled changes to travel and essential-service access.}
         \resumeItem{Built a \textbf{deterministic Rust network-analysis engine} with immutable directed graphs, turn-aware closures, SHA-256--pinned identities, FIFO-aware routing, and exact rational Frank--Wolfe reference assignment.}
-        \resumeItem{Hardened \textbf{reproducible model results} through content-addressed storage, hash-validated replay, atomic file publication, and explicit failure states that withhold comparisons for non-converged runs.}
+        \resumeItem{Hardened model results through content-addressed storage, hash-validated replay, atomic file publication, and explicit failure states that withhold comparisons for non-converged runs.}
       \resumeItemListEnd
   \resumeProjectHeading
       {\textbf{Wayward} $|$ \emph{Spring Boot, Kafka, PostGIS, Redis, OSRM, H3, Next.js, Docker Compose}}
       \resumeItemListStart
         \resumeItem{Built Wayward, a scenic-driving-loop planner that combines \textbf{OSRM} road geometry and H3-sampled environmental data to turn a start point, time budget, and vibe into three route profiles.}
-        \resumeItem{Implemented progressive delivery through a \textbf{Spring Boot/Kafka} route pipeline that publishes an exact primary route before full details; the Next.js UI rejects stale updates and falls back to bounded polling.}
-        \resumeItem{Optimized the \textbf{1,500-tile scenic-cache lookup} with a local LRU, one Redis MGET, bulk SQL misses, and pipelined fills; a real-Redis benchmark measured \textbf{90 ms vs. 3.213 s} for batch versus serial reads.}
+        \resumeItem{Implemented progressive delivery through a \textbf{Spring Boot/Kafka} route pipeline that publishes an exact primary route before full details. The Next.js UI rejects stale updates and falls back to bounded polling.}
+        \resumeItem{Optimized the \textbf{1,500-tile scenic-cache lookup} with a local LRU, one Redis MGET, bulk SQL misses, and pipelined fills. A real-Redis benchmark measured \textbf{90 ms vs. 3.213 s} for batch versus serial reads.}
       \resumeItemListEnd
   \resumeProjectHeading
       {\textbf{LazyDrop} $|$ \emph{Next.js, Spring Boot, PostgreSQL, STOMP WebSockets, S3-Compatible Storage, Stripe}}
       \resumeItemListStart
-        \resumeItem{Built LazyDrop, a real-time session-based file-sharing platform where participants join temporary rooms by short code or QR link; a \textbf{two-phase signed-URL workflow} sends file bytes directly to object storage while the backend authorizes and confirms metadata.}
+        \resumeItem{Built LazyDrop, a real-time file-sharing platform for temporary rooms joined by QR code or short link, using \textbf{two-phase signed uploads} to transfer files directly to object storage.}
         \resumeItem{Implemented per-session \textbf{STOMP/SockJS WebSockets} for peer, file, note, thumbnail, and session-lifecycle updates, publishing events after transaction commit and de-duplicating file state in React.}
         \resumeItem{Hardened Stripe subscription processing with signature validation, a persistent \textbf{idempotent webhook ledger}, transactionally claimed leases, and a bounded \textbf{10-attempt retry policy}.}
       \resumeItemListEnd
   \resumeProjectHeading
       {\textbf{WhereDidIApply} $|$ \emph{Next.js, TypeScript, Spring Boot, Gmail API, Gemini, GCP Cloud Run}}
       \resumeItemListStart
-        \resumeItem{Built WhereDidIApply, a \textbf{Next.js/TypeScript} Gmail job tracker that turns inbox messages into a searchable dashboard with user-selected scan windows of \textbf{30--365 days}.}
-        \resumeItem{Designed a privacy-conscious Gmail flow that keeps \textbf{gmail.readonly} OAuth tokens in browser state, calls Gmail directly, and persists classified results only in \textbf{localStorage}.}
-        \resumeItem{Implemented a \textbf{Spring Boot} hybrid email parser with \textbf{32 deterministic classification patterns}, structured Gemini JSON extraction, and confidence-based result merging.}
+        \resumeItem{Built WhereDidIApply, a \textbf{Gmail job tracker} that turns inbox messages into a searchable dashboard.}
+        \resumeItem{Designed a privacy-conscious Gmail flow that keeps OAuth tokens in browser state, calls Gmail directly, and provides \textbf{no server-side email storage}.}
+        \resumeItem{Implemented a Spring Boot hybrid email parser with \textbf{32 deterministic classification patterns}, structured Gemini JSON extraction, and confidence-based result merging.}
       \resumeItemListEnd
 \resumeSubHeadingListEnd
 

@@ -16,6 +16,7 @@ const versionedFiles = [
   join(dist, "index.html"),
   join(dist, "src", "main.js"),
   join(dist, "src", "components.js"),
+  join(dist, "src", "content.js"),
 ];
 
 await Promise.all(

@@ -1,7 +1,8 @@
-import { content } from "./content.js?v=56";
+import { content } from "./content.js?v=57";
 
 const {
   contact,
+  additionalProjects,
   experience,
   footer,
   labels,
@@ -59,6 +60,7 @@ export function appTemplate() {
       <main class="main">
         ${HomepageHero()}
         ${FeaturedWork()}
+        ${AdditionalWork()}
         ${ExperienceTimeline()}
         ${Afterword()}
         ${Footer()}
@@ -94,7 +96,7 @@ function HomepageHero() {
   return `
     <section class="editorial-hero" id="about" aria-labelledby="home-title">
       <div class="hero-introduction">
-        <p class="section-kicker">Backend / cloud / full-stack SWE intern</p>
+        <p class="section-kicker">${profile.role}</p>
         <h1 class="hero-title" id="home-title">${profile.name.split(" ").join("<br />")}</h1>
         <p class="hero-lede">${profile.intro}</p>
         <div class="hero-meta" aria-label="Profile summary">
@@ -158,7 +160,7 @@ function ProjectFeature(project, index) {
           <div class="project-feature-links">
             <a class="text-link" href="#project/${project.slug}">Technical breakdown ${arrow}</a>
             ${externalLinks
-              .map((link) => `<a class="text-link muted-link" href="${link.href}"${linkAttrs(link.href)}>Live site</a>`)
+              .map((link) => `<a class="text-link muted-link" href="${link.href}"${linkAttrs(link.href)}>${link.label}</a>`)
               .join("")}
           </div>
         </div>
@@ -168,7 +170,41 @@ function ProjectFeature(project, index) {
 }
 
 function ProjectFeatureVisual(project) {
+  if (!project.image) {
+    return `<div class="project-placeholder" aria-hidden="true"><span>${project.title}</span></div>`;
+  }
+
   return `<img src="${project.image}" alt="${project.title} product evidence" />`;
+}
+
+function AdditionalWork() {
+  if (!additionalProjects.length) return "";
+
+  return `
+    <section class="additional-work-section" aria-labelledby="additional-work-title">
+      <header class="section-intro">
+        <p class="section-kicker">Additional work</p>
+        <h2 class="display-title" id="additional-work-title">${labels.additionalWork}</h2>
+      </header>
+      <div class="additional-work-grid">
+        ${additionalProjects
+          .map(
+            (project) => `
+              <article class="additional-work-card" data-project="${project.slug}">
+                <p class="project-eyebrow">${project.category}</p>
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
+                <div class="project-tags" aria-label="${project.title} technologies">
+                  ${project.tags.slice(0, 5).map((tag) => `<span>${tag}</span>`).join("")}
+                </div>
+                ${renderLinks(project.links, "project-feature-links")}
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
 }
 
 function ExperienceTimeline() {
@@ -186,9 +222,10 @@ function ExperienceTimeline() {
                 <article class="experience-entry">
                   <p class="experience-index">${String(index + 1).padStart(2, "0")}</p>
                   <div>
-                    <p class="experience-years">${item.years}</p>
+                    <p class="experience-years">${item.period}</p>
                     <h3>${item.role}</h3>
                     <p class="experience-company">${item.company}</p>
+                    ${item.context ? `<p class="experience-context">${item.context}</p>` : ""}
                   </div>
                   ${ExperienceDetail(item.detail)}
                 </article>
@@ -235,7 +272,7 @@ function ProjectDetailPage(project) {
         ${ProjectExecutiveSummary(project)}
         ${ProjectEvidenceSurface(project)}
         ${ProjectStorySection(project)}
-        ${ProjectMetricList(project.metrics)}
+        ${ProjectMetricList(project.selectedResult || project.metrics)}
         ${ProjectSystemSection(project)}
         ${ProjectSimulationSection(project)}
         ${ProjectDecisionSection(project)}
@@ -296,7 +333,7 @@ function firstSentence(value) {
 
 
 function ProjectEvidenceSurface(project) {
-  const demo = project.demoVideo
+  const demo = project.demoVideo && project.image
     ? `
         <video class="evidence-demo-video" muted playsinline preload="metadata" poster="${project.image}" aria-hidden="true" tabindex="-1">
           <source src="${project.demoVideo.src}" type="video/mp4" />
@@ -306,8 +343,8 @@ function ProjectEvidenceSurface(project) {
 
   return `
     <figure class="case-evidence-surface" id="project-evidence">
-      <div class="evidence-surface-art${project.demoVideo ? " has-demo-loop" : ""}"${project.demoVideo ? ' data-demo-loop' : ""}>
-        <img src="${project.image}" alt="${project.title} product evidence" />
+      <div class="evidence-surface-art${project.demoVideo && project.image ? " has-demo-loop" : ""}"${project.demoVideo && project.image ? ' data-demo-loop' : ""}>
+        ${project.image ? `<img src="${project.image}" alt="${project.title} product evidence" />` : `<div class="project-placeholder project-placeholder-large" aria-hidden="true"><span>${project.title}</span></div>`}
         ${demo}
       </div>
       <figcaption>${EvidenceCaption(project)}</figcaption>
@@ -362,6 +399,15 @@ function ProjectStorySection(project) {
 
 function ProjectMetricList(items) {
   if (!items?.length) return "";
+
+  if (typeof items === "string") {
+    return `
+      <section class="case-facts selected-result" id="project-metrics" aria-labelledby="metrics-title">
+        <header><p class="section-kicker">Selected result</p><h2 id="metrics-title">A scoped measurement.</h2></header>
+        <p>${items}</p>
+      </section>
+    `;
+  }
 
   return `
     <section class="case-facts" id="project-metrics" aria-labelledby="metrics-title">
@@ -483,7 +529,7 @@ function ProjectDecisionSection(project) {
             (item, index) => `
               <details class="decision-drawer"${index === 0 ? " open" : ""}>
                 <summary><span>${String(index + 1).padStart(2, "0")}</span><strong>${item.title}</strong></summary>
-                <div><p><b>Why</b>${item.why}</p><p><b>Tradeoff</b>${item.tradeoff}</p></div>
+                <div><p>${item.detail || item.why}</p>${item.tradeoff ? `<p><b>Tradeoff</b>${item.tradeoff}</p>` : ""}</div>
               </details>
             `
           )
@@ -544,7 +590,7 @@ function ContactCard() {
   return `
     <section class="contact-card afterword-panel" id="contact" aria-labelledby="contact-title">
       <p class="section-kicker">Contact</p>
-      <h2 class="afterword-title" id="contact-title">${contact.headline}</h2>
+      <h2 class="afterword-title" id="contact-title">${contact.headline || labels.contact}</h2>
       <p class="contact-intro">${contact.detail}</p>
       <form class="contact-form" data-recipient="${contact.email}" novalidate aria-describedby="contact-form-error">
         <div class="form-field"><label for="name">${contact.nameLabel}</label><input class="input" id="name" name="name" type="text" value="${contact.defaults.name}" placeholder="${contact.placeholders.name}" required aria-required="true" aria-describedby="contact-form-error" /></div>

@@ -24,7 +24,7 @@ function render() {
   setupMenu();
   setupContactForm();
   setupSystemExplorer();
-  setupMermaidDiagrams().then(setupDiagramPan);
+  setupDiagramPan();
   setupResponsiveProjectDetails();
   restoreAnchorScroll();
 }
@@ -460,42 +460,11 @@ function setupSystemExplorer() {
 }
 
 
-async function setupMermaidDiagrams() {
-  const diagrams = [...document.querySelectorAll(".mermaid")];
-  if (!diagrams.length) return;
-
-  try {
-    const mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
-
-    mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: "strict",
-      theme: "dark",
-      themeVariables: {
-        background: "#0a0a0a",
-        mainBkg: "#121212",
-        primaryColor: "#121212",
-        primaryTextColor: "#ffffff",
-        primaryBorderColor: "#343434",
-        lineColor: "#8f8f8f",
-        edgeLabelBackground: "#050505",
-        fontFamily: "Instrument Sans, Inter, system-ui, sans-serif",
-      },
-    });
-
-    await mermaid.run({ nodes: diagrams });
-  } catch (error) {
-    document.querySelectorAll(".architecture-diagram").forEach((diagram) => {
-      diagram.classList.add("is-static");
-    });
-  }
-}
-
 function setupDiagramPan() {
   document.querySelectorAll(".architecture-diagram").forEach((diagram) => {
     const svg = diagram.querySelector("svg");
     const resetButton = diagram.querySelector('[data-diagram-zoom="reset"]');
-    const baseWidth = diagram.classList.contains("lifecycle-diagram") ? 1320 : 1180;
+    const baseWidth = Number(svg?.dataset.baseWidth) || 1180;
     let zoom = 1;
     let startX = 0;
     let startY = 0;
@@ -517,7 +486,7 @@ function setupDiagramPan() {
       });
     };
 
-    applyZoom(1);
+    if (svg) { svg.style.width = `${baseWidth}px`; svg.style.maxWidth = "none"; }
 
     diagram.querySelectorAll("[data-diagram-zoom]").forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -540,7 +509,7 @@ function setupDiagramPan() {
     );
 
     diagram.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0 || event.target.closest(".diagram-controls")) return;
+      if (event.pointerType === "touch" || event.button !== 0 || event.target.closest(".diagram-controls")) return;
       isDragging = true;
       diagram.classList.add("is-panning");
       startX = event.clientX;

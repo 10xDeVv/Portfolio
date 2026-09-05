@@ -49,7 +49,179 @@ export const generatedContent = {
           "label": "GitHub",
           "href": "https://github.com/10xDeVv/Breakpoint"
         }
-      ]
+      ],
+      "architecture": {
+        "caption": "A single-host Rust service runs modeled disruption jobs against prepared city data and stores reusable, identity-checked results.",
+        "nodes": [
+          {
+            "id": "client",
+            "label": "React / TypeScript map"
+          },
+          {
+            "id": "api",
+            "label": "Generic Rust city API"
+          },
+          {
+            "id": "jobs",
+            "label": "Persistent async jobs"
+          },
+          {
+            "id": "engine",
+            "label": "Deterministic assignment"
+          },
+          {
+            "id": "baselines",
+            "label": "Prepared city baselines"
+          },
+          {
+            "id": "results",
+            "label": "Content-addressed results"
+          },
+          {
+            "id": "access",
+            "label": "Consequence / access analysis"
+          }
+        ],
+        "edges": [
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Submit closures / retrieve results"
+          },
+          {
+            "from": "api",
+            "to": "jobs",
+            "label": "Validate and enqueue"
+          },
+          {
+            "from": "jobs",
+            "to": "engine",
+            "label": "Run bounded city work"
+          },
+          {
+            "from": "baselines",
+            "to": "engine",
+            "label": "Reuse verified baseline"
+          },
+          {
+            "from": "engine",
+            "to": "results",
+            "label": "Persist modeled outputs"
+          },
+          {
+            "from": "results",
+            "to": "access",
+            "label": "Derive requested sidecars"
+          },
+          {
+            "from": "access",
+            "to": "api",
+            "label": "Return consequence analysis"
+          },
+          {
+            "from": "results",
+            "to": "api",
+            "label": "Read saved result"
+          }
+        ]
+      },
+      "requestLifecycle": {
+        "caption": "A road-closure scenario becomes a persistent job, a checked modeled result, and an interactive map comparison.",
+        "actors": [
+          {
+            "id": "client",
+            "label": "Map client"
+          },
+          {
+            "id": "api",
+            "label": "City API"
+          },
+          {
+            "id": "jobs",
+            "label": "Async jobs"
+          },
+          {
+            "id": "engine",
+            "label": "Assignment"
+          },
+          {
+            "id": "store",
+            "label": "Result storage"
+          },
+          {
+            "id": "access",
+            "label": "Access analysis"
+          }
+        ],
+        "steps": [
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Submit city and closure scenario",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "api",
+            "label": "Validate input; resolve directed closure edges",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "jobs",
+            "label": "Persist / enqueue job",
+            "async": true
+          },
+          {
+            "from": "api",
+            "to": "client",
+            "label": "Return accepted job ID",
+            "async": false
+          },
+          {
+            "from": "jobs",
+            "to": "engine",
+            "label": "Reuse verified baseline; solve disruption",
+            "async": true
+          },
+          {
+            "from": "engine",
+            "to": "engine",
+            "label": "Check convergence and model invariants",
+            "async": false
+          },
+          {
+            "from": "engine",
+            "to": "store",
+            "label": "Persist identity-checked result",
+            "async": false
+          },
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Poll job; request result and consequence data",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "store",
+            "label": "Read saved result",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "access",
+            "label": "Derive requested consequence / access sidecar",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "client",
+            "label": "Return modeled comparison and explicit status",
+            "async": false
+          }
+        ]
+      }
     },
     {
       "slug": "wayward",
@@ -87,7 +259,213 @@ export const generatedContent = {
           "href": "https://github.com/10xDeVv/Wayward"
         }
       ],
-      "selectedResult": "Reduced a 1,500-tile real-Redis lookup benchmark from 3,213 milliseconds to 90 milliseconds by replacing 1,500 serial Redis GETs with one MGET over the same deterministic, Redis-warm key set."
+      "selectedResult": "Reduced a 1,500-tile real-Redis lookup benchmark from 3,213 milliseconds to 90 milliseconds by replacing 1,500 serial Redis GETs with one MGET over the same deterministic, Redis-warm key set.",
+      "architecture": {
+        "caption": "Route jobs are committed before Kafka dispatch; workers combine scenic data with OSRM and deliver revisioned results.",
+        "nodes": [
+          {
+            "id": "client",
+            "label": "Next.js map client"
+          },
+          {
+            "id": "api",
+            "label": "Spring Boot route API"
+          },
+          {
+            "id": "kafka",
+            "label": "Kafka"
+          },
+          {
+            "id": "worker",
+            "label": "Route worker"
+          },
+          {
+            "id": "db",
+            "label": "PostgreSQL / PostGIS"
+          },
+          {
+            "id": "redis",
+            "label": "Redis scenic cache"
+          },
+          {
+            "id": "osrm",
+            "label": "OSRM routing"
+          },
+          {
+            "id": "notify",
+            "label": "Notification / WebSocket"
+          }
+        ],
+        "edges": [
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Submit route / poll results"
+          },
+          {
+            "from": "api",
+            "to": "db",
+            "label": "Commit job + dispatch outbox"
+          },
+          {
+            "from": "api",
+            "to": "kafka",
+            "label": "Dispatch committed jobs"
+          },
+          {
+            "from": "kafka",
+            "to": "worker",
+            "label": "Deliver route jobs"
+          },
+          {
+            "from": "worker",
+            "to": "redis",
+            "label": "Fetch scenic tiles"
+          },
+          {
+            "from": "worker",
+            "to": "db",
+            "label": "Scenic fallback / persist options"
+          },
+          {
+            "from": "worker",
+            "to": "osrm",
+            "label": "Construct drivable loops"
+          },
+          {
+            "from": "worker",
+            "to": "kafka",
+            "label": "Publish lifecycle completion"
+          },
+          {
+            "from": "kafka",
+            "to": "notify",
+            "label": "Deliver lifecycle events"
+          },
+          {
+            "from": "notify",
+            "to": "client",
+            "label": "Push revisioned updates"
+          }
+        ]
+      },
+      "requestLifecycle": {
+        "caption": "A durable scenic-route job crosses Kafka, is scored and persisted by a worker, then reaches the client through WebSocket updates or polling.",
+        "actors": [
+          {
+            "id": "client",
+            "label": "Client"
+          },
+          {
+            "id": "api",
+            "label": "Route API"
+          },
+          {
+            "id": "db",
+            "label": "PostgreSQL"
+          },
+          {
+            "id": "kafka",
+            "label": "Kafka"
+          },
+          {
+            "id": "worker",
+            "label": "Worker"
+          },
+          {
+            "id": "scenic",
+            "label": "Scenic data"
+          },
+          {
+            "id": "osrm",
+            "label": "OSRM"
+          },
+          {
+            "id": "notify",
+            "label": "Notifications"
+          }
+        ],
+        "steps": [
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Request scenic loop",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "db",
+            "label": "Commit revisioned job + outbox together",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "client",
+            "label": "202 Accepted with job ID",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "kafka",
+            "label": "Dispatch committed outbox; retry failures",
+            "async": true
+          },
+          {
+            "from": "kafka",
+            "to": "worker",
+            "label": "Deliver job; acquire worker lease",
+            "async": true
+          },
+          {
+            "from": "worker",
+            "to": "scenic",
+            "label": "Fetch H3 features: local / Redis / PostGIS",
+            "async": false
+          },
+          {
+            "from": "worker",
+            "to": "osrm",
+            "label": "Generate legal candidate loops",
+            "async": false
+          },
+          {
+            "from": "worker",
+            "to": "worker",
+            "label": "Score corridors; select differentiated options",
+            "async": false
+          },
+          {
+            "from": "worker",
+            "to": "db",
+            "label": "Persist route options with lease fencing",
+            "async": false
+          },
+          {
+            "from": "worker",
+            "to": "kafka",
+            "label": "Publish revisioned completion",
+            "async": true
+          },
+          {
+            "from": "kafka",
+            "to": "notify",
+            "label": "Consume lifecycle event",
+            "async": true
+          },
+          {
+            "from": "notify",
+            "to": "client",
+            "label": "WebSocket update; polling fallback via API",
+            "async": true
+          },
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Fetch persisted route options for the map",
+            "async": false
+          }
+        ]
+      }
     },
     {
       "slug": "lazydrop",
@@ -123,7 +501,179 @@ export const generatedContent = {
           "label": "GitHub",
           "href": "https://github.com/10xDeVv/LazyDrop"
         }
-      ]
+      ],
+      "architecture": {
+        "caption": "The API owns room access and metadata while browsers transfer file bytes directly to private object storage.",
+        "nodes": [
+          {
+            "id": "client",
+            "label": "Next.js room client"
+          },
+          {
+            "id": "api",
+            "label": "Spring Boot API"
+          },
+          {
+            "id": "db",
+            "label": "PostgreSQL"
+          },
+          {
+            "id": "storage",
+            "label": "S3-compatible storage"
+          },
+          {
+            "id": "realtime",
+            "label": "STOMP / WebSocket"
+          },
+          {
+            "id": "auth",
+            "label": "Supabase Auth"
+          },
+          {
+            "id": "stripe",
+            "label": "Stripe"
+          }
+        ],
+        "edges": [
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Room actions / signed URL requests"
+          },
+          {
+            "from": "client",
+            "to": "storage",
+            "label": "Direct signed file transfer"
+          },
+          {
+            "from": "client",
+            "to": "auth",
+            "label": "Account sign-in"
+          },
+          {
+            "from": "api",
+            "to": "db",
+            "label": "Persist room and file metadata"
+          },
+          {
+            "from": "api",
+            "to": "realtime",
+            "label": "Broadcast room state"
+          },
+          {
+            "from": "realtime",
+            "to": "client",
+            "label": "Notify room participants"
+          },
+          {
+            "from": "api",
+            "to": "stripe",
+            "label": "Checkout / subscription operations"
+          },
+          {
+            "from": "stripe",
+            "to": "api",
+            "label": "Retry-safe billing webhooks"
+          }
+        ]
+      },
+      "requestLifecycle": {
+        "caption": "A signed upload sends bytes directly to storage; confirmation records the file and notifies the room.",
+        "actors": [
+          {
+            "id": "client",
+            "label": "Uploading client"
+          },
+          {
+            "id": "api",
+            "label": "Backend API"
+          },
+          {
+            "id": "db",
+            "label": "PostgreSQL"
+          },
+          {
+            "id": "storage",
+            "label": "Object storage"
+          },
+          {
+            "id": "realtime",
+            "label": "WebSocket"
+          },
+          {
+            "id": "peer",
+            "label": "Room participant"
+          }
+        ],
+        "steps": [
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Request upload for joined room",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "api",
+            "label": "Authorize guest / JWT; enforce room and plan limits",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "client",
+            "label": "Return short-lived signed upload URL",
+            "async": false
+          },
+          {
+            "from": "client",
+            "to": "storage",
+            "label": "Upload file bytes directly",
+            "async": false
+          },
+          {
+            "from": "storage",
+            "to": "client",
+            "label": "Return upload success",
+            "async": false
+          },
+          {
+            "from": "client",
+            "to": "api",
+            "label": "Confirm completed upload",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "db",
+            "label": "Persist confirmed file metadata",
+            "async": false
+          },
+          {
+            "from": "api",
+            "to": "realtime",
+            "label": "Broadcast file-uploaded room event",
+            "async": true
+          },
+          {
+            "from": "realtime",
+            "to": "peer",
+            "label": "Update room file list",
+            "async": true
+          },
+          {
+            "from": "peer",
+            "to": "api",
+            "label": "Request authorized signed download URL",
+            "async": false
+          },
+          {
+            "from": "peer",
+            "to": "storage",
+            "label": "Download bytes directly",
+            "async": false
+          }
+        ]
+      }
     }
   ],
   "additionalProjects": [
@@ -200,7 +750,7 @@ export const generatedContent = {
       "location": "Fredericton, NB",
       "context": "Student-led hackathon being organized for September 2026.",
       "detail": [
-        "Team-built applicant and event operations platform covering applications, reviews, decisions, passes, QR scanning, and reporting."
+        "Led a team building the Hack Atlantic applicant and event platform with authenticated nine-question applications, saved drafts, private optional PDF resumes, organizer review and permissions, released decisions, accepted-applicant RSVP, separately released QR passes, and transactional check-in."
       ]
     },
     {

@@ -15,7 +15,8 @@ const enrichProject = (project) => {
     systemFlow: [],
     routeSimulation: [],
     failureModes: [],
-    architecture: [],
+    architecture: project.architecture,
+    requestLifecycle: project.requestLifecycle,
     differentiators: [],
     resumeBullets: [],
   };

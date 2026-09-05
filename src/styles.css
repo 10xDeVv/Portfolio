@@ -1108,3 +1108,26 @@ body.has-ambient-grain::after { opacity: 0; }
   .additional-work-grid { grid-template-columns: 1fr; }
   .project-placeholder { min-height: 210px; }
 }
+
+
+/* Technical diagrams: locally rendered SVG with generated public content. */
+.project-technical-diagrams, .project-technical-diagrams .case-disclosure,
+.project-technical-diagrams .disclosure-body { min-width: 0; max-width: 100%; }
+.project-technical-diagrams .case-disclosure + .case-disclosure { margin-top: 24px; }
+.project-technical-diagrams .architecture-diagram { max-width: 100%; box-sizing: border-box; max-height: 850px; }
+.project-technical-diagrams svg { display: block; font-family: var(--font-body, system-ui), sans-serif; }
+.diagram-node { fill: #182522; stroke: #66857b; stroke-width: 1.4; }
+.diagram-label { fill: #f2f8f5; font-size: 17px; font-weight: 650; }
+.diagram-edge { fill: none; stroke: #a8c9bd; stroke-width: 1.8; }
+.diagram-edge-label { fill: #ddece6; font-size: 16px; paint-order: stroke; stroke: #111514; stroke-width: 7px; stroke-linejoin: round; }
+.diagram-lifeline { stroke: #61756c; stroke-width: 1; stroke-dasharray: 4 7; }
+.diagram-async { stroke-dasharray: 7 5; }
+.diagram-caption { max-width: 850px; margin: 16px 0 0; color: var(--ink-soft); line-height: 1.6; }
+.diagram-navigation { margin: 8px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
+.project-technical-diagrams .diagram-controls button { min-width: 44px; min-height: 44px; }
+.architecture-diagram:focus-visible { outline: 2px solid #a8c9bd; outline-offset: 3px; }
+@media(max-width:720px) {
+  .project-technical-diagrams .architecture-diagram { max-height: 600px; }
+  .project-technical-diagrams summary { grid-template-columns: minmax(0,1fr) 28px; }
+  .project-technical-diagrams summary span { font-size: 18px; }
+}

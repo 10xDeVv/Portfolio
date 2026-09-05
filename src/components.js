@@ -1,3 +1,4 @@
+import { technicalDiagrams } from "./diagrams.js?v=1";
 import { content } from "./content.js?v=57";
 
 const {
@@ -126,8 +127,8 @@ function FeaturedWork() {
     <section class="work-section" id="work" aria-labelledby="work-title">
       <header class="section-intro">
         <p class="section-kicker">Selected work</p>
-        <h2 class="display-title" id="work-title">${labels.featuredWork} as case files, not thumbnails.</h2>
-        <p>Start with the product question. Open a case file when you want the evidence, tradeoffs, and implementation depth.</p>
+        <h2 class="display-title" id="work-title">${labels.featuredWork}</h2>
+        <p>Explore the products, how they work, and the decisions behind them.</p>
       </header>
       <ol class="featured-projects">
         ${projects.map((project, index) => ProjectFeature(project, index)).join("")}
@@ -273,8 +274,7 @@ function ProjectDetailPage(project) {
         ${ProjectEvidenceSurface(project)}
         ${ProjectStorySection(project)}
         ${ProjectMetricList(project.selectedResult || project.metrics)}
-        ${ProjectSystemSection(project)}
-        ${ProjectSimulationSection(project)}
+        ${technicalDiagrams(project)}
         ${ProjectDecisionSection(project)}
         ${ProjectProofAppendix(project)}
         ${ProjectContributionAppendix(project.resumeBullets)}
@@ -290,7 +290,7 @@ function ProjectThesis(project, detailLinks) {
   return `
     <header class="case-thesis" id="case-thesis">
       <div class="case-thesis-copy">
-        <p class="project-eyebrow">Case file · ${project.category}</p>
+        <p class="project-eyebrow">${project.category}</p>
         <h1>${displayTitle}</h1>
         <p class="case-headline">${project.headline}</p>
         <div class="project-tags detail-tags" aria-label="${project.title} technologies">
@@ -353,16 +353,7 @@ function ProjectEvidenceSurface(project) {
 }
 
 function EvidenceCaption(project) {
-  if (project.slug === "wayward") {
-    return "Evidence surface: Wayward’s route engine is judged by legal geometry, scenic quality, and an honest unavailable state—not a guaranteed route.";
-  }
-  if (project.slug === "lazydrop") {
-    return "Evidence surface: file bytes move directly between the browser and object storage while the API owns access, metadata, and realtime session state.";
-  }
-  if (project.slug === "wheredidiapply") {
-    return "Evidence surface: Gmail OAuth remains browser-held; the backend receives only snippets for in-memory classification and the editable dashboard stays local.";
-  }
-  return "Evidence surface: Audire turns a short musical idea into three clearly different practice paths, with an explicit note that the response is creative guidance rather than a musical verdict.";
+  return project.description || project.overview;
 }
 
 

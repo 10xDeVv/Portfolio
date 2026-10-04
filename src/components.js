@@ -1,11 +1,13 @@
 import { technicalDiagrams } from "./diagrams.js?v=1";
 import { content } from "./content.js?v=57";
+import { parseProjectRoute } from "./navigation.js?v=1";
 
 const {
   contact,
   additionalProjects,
   experience,
   footer,
+  highlights,
   labels,
   nav,
   profile,
@@ -21,13 +23,6 @@ const arrow = `
 `;
 
 const linkAttrs = (href) => (href?.startsWith("#") ? "" : ' target="_blank" rel="noreferrer"');
-
-const caseFocus = {
-  wayward: "Route quality is a contract",
-  lazydrop: "The control plane, not the file pipe",
-  wheredidiapply: "The privacy boundary",
-  audire: "Creative agency without false certainty",
-};
 
 const renderLinks = (links = [], className = "action-links") => {
   if (!links.length) return "";
@@ -58,11 +53,12 @@ export function appTemplate() {
   return `
     <div class="app">
       ${Header()}
-      <main class="main">
+      <main class="main" id="main-content" tabindex="-1">
         ${HomepageHero()}
         ${FeaturedWork()}
         ${AdditionalWork()}
         ${ExperienceTimeline()}
+        ${PersonalNote()}
         ${Afterword()}
         ${Footer()}
       </main>
@@ -70,17 +66,18 @@ export function appTemplate() {
   `;
 }
 
-function Header() {
+function Header(project = null) {
   return `
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="nav-shell">
-      <nav class="navbar">
+      <nav class="navbar" aria-label="Main navigation">
         <div class="nav-top">
           <a class="logo" href="#about"><em>${content.site.logo.italic}</em><strong>${content.site.logo.bold}</strong></a>
-          <button class="menu-icon" type="button" aria-label="Toggle menu" aria-expanded="false">
+          <button class="menu-icon" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-navigation">
             <span></span><span></span>
           </button>
         </div>
-        <div class="nav-links" aria-label="Primary">
+        <div class="nav-links" id="primary-navigation">
           ${nav
             .map(
               (item) =>
@@ -89,6 +86,7 @@ function Header() {
             .join("")}
         </div>
       </nav>
+      ${project ? `<div class="reading-progress" role="progressbar" aria-label="${project.title} reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>` : ""}
     </header>
   `;
 }
@@ -105,9 +103,10 @@ function HomepageHero() {
         </div>
         ${HeroContactActions()}
       </div>
+      ${HomepageEvidence()}
       <figure class="portrait-card" aria-label="${profile.portrait.alt}">
-        <img class="portrait-gray" src="${profile.portrait.src}" alt="${profile.portrait.alt}" />
-        <img class="portrait-color" src="${profile.portrait.src}" alt="" aria-hidden="true" />
+        <img class="portrait-gray" src="${profile.portrait.src}" alt="${profile.portrait.alt}" fetchpriority="high" decoding="async" />
+        <img class="portrait-color" src="${profile.portrait.src}" alt="" aria-hidden="true" decoding="async" />
       </figure>
       <aside class="hero-position" aria-label="Engineering focus">
         <p class="section-kicker">How I work</p>
@@ -121,6 +120,35 @@ function HomepageHero() {
   `;
 }
 
+
+function HomepageEvidence() {
+  return `
+    <section class="homepage-evidence" aria-labelledby="evidence-title">
+      <h2 class="section-kicker" id="evidence-title">Selected results</h2>
+      <ul class="evidence-grid">
+        ${highlights.map((item) => `
+          <li><a class="evidence-item" href="${item.href}">
+            <strong class="evidence-value"><span class="counter-accessible">${item.value}</span><span data-count-up aria-hidden="true">${item.value}</span></strong>
+            <span class="evidence-label">${item.label}</span>
+            <span class="evidence-context">${item.context}</span>
+            <span class="evidence-link">${item.linkLabel} ${arrow}</span>
+          </a></li>
+        `).join("")}
+      </ul>
+    </section>
+  `;
+}
+
+function PersonalNote() {
+  return `
+    <section class="personal-note" aria-labelledby="personal-title">
+      <div><p class="section-kicker">A little more about me</p><h2 id="personal-title">Away from the keyboard</h2></div>
+      <div><p>Outside software, I make time for a few other things.</p>
+        <ul class="interest-list">${profile.interests.map((interest) => `<li>${interest}</li>`).join("")}</ul>
+      </div>
+    </section>
+  `;
+}
 
 function FeaturedWork() {
   return `
@@ -154,6 +182,7 @@ function ProjectFeature(project, index) {
           <h3>${project.title}</h3>
           <p class="project-feature-headline">${project.headline}</p>
           <p class="project-feature-summary">${project.description}</p>
+          <p class="project-contribution"><strong>My contribution</strong> ${project.contribution}</p>
           <p class="project-proof">${project.proof}</p>
           <div class="project-tags" aria-label="${project.title} technologies">
             ${project.tags.slice(0, 5).map((tag) => `<span>${tag}</span>`).join("")}
@@ -175,7 +204,7 @@ function ProjectFeatureVisual(project) {
     return `<div class="project-placeholder" aria-hidden="true"><span>${project.title}</span></div>`;
   }
 
-  return `<img src="${project.image}" alt="${project.title} product evidence" />`;
+  return `<img src="${project.image}" alt="${project.title} interface" loading="lazy" decoding="async" />`;
 }
 
 function AdditionalWork() {
@@ -195,6 +224,7 @@ function AdditionalWork() {
                 <p class="project-eyebrow">${project.category}</p>
                 <h3>${project.title}</h3>
                 <p>${project.description}</p>
+                <p class="project-contribution"><strong>My contribution</strong> ${project.contribution}</p>
                 <div class="project-tags" aria-label="${project.title} technologies">
                   ${project.tags.slice(0, 5).map((tag) => `<span>${tag}</span>`).join("")}
                 </div>
@@ -213,14 +243,14 @@ function ExperienceTimeline() {
     <section class="experience-section" id="experience" aria-labelledby="experience-title">
       <header class="section-intro experience-intro">
         <p class="section-kicker">Experience</p>
-        <h2 class="display-title" id="experience-title">A linear record of responsibility.</h2>
+        <h2 class="display-title" id="experience-title">Engineering experience</h2>
       </header>
       <ol class="experience-timeline">
         ${experience
           .map(
             (item, index) => `
               <li>
-                <article class="experience-entry">
+                <article class="experience-entry" id="experience-${item.slug}">
                   <p class="experience-index">${String(index + 1).padStart(2, "0")}</p>
                   <div>
                     <p class="experience-years">${item.period}</p>
@@ -228,7 +258,7 @@ function ExperienceTimeline() {
                     <p class="experience-company">${item.company}</p>
                     ${item.context ? `<p class="experience-context">${item.context}</p>` : ""}
                   </div>
-                  ${ExperienceDetail(item.detail)}
+                  <div>${ExperienceDetail(item.detail)}${item.evidence ? `<p class="experience-result">${item.evidence.value} · ${item.evidence.label}</p>` : ""}</div>
                 </article>
               </li>
             `
@@ -266,25 +296,28 @@ function ProjectDetailPage(project) {
 
   return `
     <div class="project-page" data-project="${project.slug}">
-      ${Header()}
-      <main class="project-detail">
+      ${Header(project)}
+      <main class="project-detail" id="main-content" tabindex="-1">
         <a class="back-link" href="#work" aria-label="Back to selected projects">← Selected work</a>
         ${ProjectThesis(project, detailLinks)}
         ${ProjectExecutiveSummary(project)}
         ${ProjectEvidenceSurface(project)}
-        ${ProjectStorySection(project)}
         ${ProjectMetricList(project.selectedResult || project.metrics)}
-        ${technicalDiagrams(project)}
         ${ProjectDecisionSection(project)}
+        ${technicalDiagrams(project)}
         ${ProjectProofAppendix(project)}
         ${ProjectContributionAppendix(project.resumeBullets)}
+        <nav class="case-next" aria-label="Continue exploring">
+          <a class="text-link" href="#work">← More projects</a>
+          <a class="text-link" href="#contact">Get in touch ${arrow}</a>
+          <a class="text-link" href="${profile.resume}" target="_blank" rel="noreferrer">Resume ${arrow}</a>
+        </nav>
       </main>
     </div>
   `;
 }
 
 function ProjectThesis(project, detailLinks) {
-  const outcome = project.impact?.[0] || project.features?.[0];
   const displayTitle = project.title.replace(/([a-z])(?=[A-Z])/g, "$1<wbr>");
 
   return `
@@ -298,9 +331,8 @@ function ProjectThesis(project, detailLinks) {
         </div>
       </div>
       <aside class="case-outcome">
-        <p class="section-kicker">Outcome</p>
-        <strong>${outcome?.title || project.proof}</strong>
-        <p>${outcome?.detail || project.solution}</p>
+        <p class="section-kicker">Scope</p>
+        <p>${project.status}</p>
         ${renderLinks(detailLinks, "project-hero-links")}
       </aside>
     </header>
@@ -312,13 +344,14 @@ function ProjectExecutiveSummary(project) {
     <section class="case-brief" id="project-brief" aria-labelledby="brief-title">
       <div>
         <p class="section-kicker">15-second read</p>
-        <h2 id="brief-title">The essential move.</h2>
+        <h2 id="brief-title">Project at a glance</h2>
       </div>
-      <p class="case-brief-summary">${firstSentence(project.overview) || project.headline}</p>
+      <p class="case-brief-summary">${project.description || firstSentence(project.overview)}</p>
       <dl>
-        <div><dt>Problem</dt><dd>${firstSentence(project.problem) || project.category}</dd></div>
-        <div><dt>Decision</dt><dd>${firstSentence(project.solution) || project.proof}</dd></div>
-        <div><dt>Proof</dt><dd>${project.proof}</dd></div>
+        <div><dt>My contribution</dt><dd>${project.contribution}</dd></div>
+        <div><dt>Problem</dt><dd>${project.brief?.problem || firstSentence(project.problem) || project.category}</dd></div>
+        <div><dt>Decision</dt><dd>${project.brief?.decision || firstSentence(project.solution)}</dd></div>
+        <div><dt>Evidence</dt><dd>${project.brief?.proof || project.proof}</dd></div>
       </dl>
     </section>
   `;
@@ -344,7 +377,7 @@ function ProjectEvidenceSurface(project) {
   return `
     <figure class="case-evidence-surface" id="project-evidence">
       <div class="evidence-surface-art${project.demoVideo && project.image ? " has-demo-loop" : ""}"${project.demoVideo && project.image ? ' data-demo-loop' : ""}>
-        ${project.image ? `<img src="${project.image}" alt="${project.title} product evidence" />` : `<div class="project-placeholder project-placeholder-large" aria-hidden="true"><span>${project.title}</span></div>`}
+        ${project.image ? `<img src="${project.image}" alt="${project.title} interface" loading="lazy" decoding="async" />` : `<div class="project-placeholder project-placeholder-large" aria-hidden="true"><span>${project.title}</span></div>`}
         ${demo}
       </div>
       <figcaption>${EvidenceCaption(project)}</figcaption>
@@ -357,44 +390,13 @@ function EvidenceCaption(project) {
 }
 
 
-function ProjectStorySection(project) {
-  const sections = [
-    ["Context", project.overview],
-    ["Constraint", project.problem],
-    ["Decision", project.solution],
-  ].filter(([, text]) => text);
-
-  if (!sections.length) return "";
-
-  return `
-    <section class="case-chapter case-story" id="project-story" aria-labelledby="story-title">
-      <header class="chapter-heading">
-        <p class="section-kicker">Chapter 01</p>
-        <h2 id="story-title">${caseFocus[project.slug] || "The build"}</h2>
-      </header>
-      <div class="story-flow">
-        ${sections
-          .map(
-            ([title, text], index) => `
-              <article class="story-beat">
-                <p>${String(index + 1).padStart(2, "0")}</p>
-                <div><h3>${title}</h3><p>${text}</p></div>
-              </article>
-            `
-          )
-          .join("")}
-      </div>
-    </section>
-  `;
-}
-
 function ProjectMetricList(items) {
   if (!items?.length) return "";
 
   if (typeof items === "string") {
     return `
       <section class="case-facts selected-result" id="project-metrics" aria-labelledby="metrics-title">
-        <header><p class="section-kicker">Selected result</p><h2 id="metrics-title">A scoped measurement.</h2></header>
+        <header><p class="section-kicker">Selected result</p><h2 id="metrics-title">What the benchmark measured</h2></header>
         <p>${items}</p>
       </section>
     `;
@@ -511,8 +513,9 @@ function ProjectDecisionSection(project) {
   return `
     <section class="case-chapter decision-section" id="project-decisions" aria-labelledby="decisions-title">
       <header class="chapter-heading">
-        <p class="section-kicker">Chapter 03 · Decision log</p>
-        <h2 id="decisions-title">Reasoning before implementation detail.</h2>
+        <p class="section-kicker">Engineering decisions</p>
+        <h2 id="decisions-title">${project.story.title}</h2>
+        <p class="story-intro">${project.story.intro}</p>
       </header>
       <div class="decision-drawers">
         ${(project.engineeringDecisions || [])
@@ -582,10 +585,11 @@ function ContactCard() {
     <section class="contact-card afterword-panel" id="contact" aria-labelledby="contact-title">
       <p class="section-kicker">Contact</p>
       <h2 class="afterword-title" id="contact-title">${contact.headline || labels.contact}</h2>
-      <p class="contact-intro">${contact.detail}</p>
+      <p class="contact-intro">${contact.detail} <a href="${profile.contactHref}">${contact.email}</a></p>
+      <p class="contact-note">This form opens a draft in your email app.</p>
       <form class="contact-form" data-recipient="${contact.email}" novalidate aria-describedby="contact-form-error">
-        <div class="form-field"><label for="name">${contact.nameLabel}</label><input class="input" id="name" name="name" type="text" value="${contact.defaults.name}" placeholder="${contact.placeholders.name}" required aria-required="true" aria-describedby="contact-form-error" /></div>
-        <div class="form-field"><label for="contact-address">${contact.emailLabel}</label><input class="input" id="contact-address" name="contact" type="text" value="${contact.defaults.contact}" placeholder="${contact.placeholders.contact}" aria-describedby="contact-form-error" /></div>
+        <div class="form-field"><label for="name">${contact.nameLabel}</label><input class="input" id="name" name="name" type="text" autocomplete="name" value="${contact.defaults.name}" placeholder="${contact.placeholders.name}" required aria-required="true" aria-describedby="contact-form-error" /></div>
+        <div class="form-field"><label for="contact-address">${contact.emailLabel}</label><input class="input" id="contact-address" name="contact" type="email" autocomplete="email" value="${contact.defaults.contact}" placeholder="${contact.placeholders.contact}" aria-describedby="contact-form-error" /></div>
         <div class="form-field"><label for="message">${contact.messageLabel}</label><textarea class="textarea" id="message" name="message" placeholder="${contact.placeholders.message}" required aria-required="true" aria-describedby="contact-form-error">${contact.defaults.message}</textarea></div>
         <p class="contact-form-error" id="contact-form-error" role="alert" tabindex="-1" hidden></p>
         <button class="submit-button" type="submit">${labels.submit}</button>
@@ -616,7 +620,6 @@ function Footer() {
 
 function getActiveProject() {
   if (typeof window === "undefined") return null;
-  const match = window.location.hash.match(/^#project\/([a-z0-9-]+)$/i);
-  if (!match) return null;
-  return projects.find((project) => project.slug === match[1]) || null;
+  const route = parseProjectRoute(window.location.hash);
+  return projects.find((project) => project.slug === route?.slug) || null;
 }

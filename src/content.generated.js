@@ -11,7 +11,12 @@ export const generatedContent = {
     "education": "Bachelor of Computer Science, Co-op",
     "linkedin": "https://linkedin.com/in/waally-xyz",
     "github": "https://github.com/10xDeVv",
-    "resume": "./public/assets/resume.pdf"
+    "resume": "./public/assets/resume.pdf",
+    "interests": [
+      "table tennis",
+      "piano",
+      "Rubik's Cube solving"
+    ]
   },
   "projects": [
     {
@@ -19,22 +24,23 @@ export const generatedContent = {
       "title": "Breakpoint",
       "category": "Transportation systems",
       "image": null,
-      "overview": "Built a five-city transportation-disruption beta combining a Rust computational service, React and TypeScript geospatial interface, shared multi-city API, modeled road, corridor, and flood-area scenarios, saved-result reopening, and neighborhood and essential-service consequences.",
+      "overview": "Built a five-city modeled transportation-disruption beta integrating a shared Rust service, React/TypeScript geospatial interface, server-resolved road and geographic scenarios, and saved-result comparisons.",
+      "contribution": "Primary developer of the Rust analysis service, modeled assignment engine and React map interface.",
       "engineeringDecisions": [
         {
           "title": "Persistent analysis jobs",
-          "detail": "Built a generic Rust multi-city server for city readiness, scenario preview, asynchronous assignment jobs and progress, persistent job and result state, saved-result reopening, lazy packet and consequence detail generation, restart recovery, and health, readiness, and metrics endpoints."
+          "detail": "Built a shared Rust multi-city HTTP service connecting validated scenario previews to bounded asynchronous jobs, progress, persistent local results and saved-result retrieval."
         },
         {
           "title": "Deterministic assignment",
-          "detail": "Implemented deterministic Rust traffic assignment with directed and turn-aware routing, exact physical-link closure expansion, baseline and disruption solves, explicit convergence and unserved-demand state, grouped-origin optimization, and reference-behavior validation."
+          "detail": "Implemented deterministic affine Frank–Wolfe traffic assignment in Rust with directed and turn-aware routing, exact closure expansion, quantized allocations, explicit convergence and unserved demand, and bounded exact-oracle validation."
         },
         {
           "title": "Correctness before presentation",
-          "detail": "Treated correctness as a system property by withholding authoritative metrics for non-converged flows and verifying route and closure legality, demand conservation, explicit unserved demand, deterministic identities, compression round trips, restart recovery, geographic hazard intersections, and asynchronous job idempotence."
+          "detail": "Withheld authoritative modeled results on nonconvergence and checked closure and route legality, demand conservation, unserved demand and artifact identity across solver, API and presentation boundaries."
         }
       ],
-      "status": "A modeled five-city beta built from prepared transportation data.",
+      "status": "A five-city modeled beta using prepared, uncalibrated transportation data.",
       "tags": [
         "Rust",
         "Python",
@@ -227,8 +233,9 @@ export const generatedContent = {
       "slug": "wayward",
       "title": "Wayward",
       "category": "Scenic route planning",
-      "image": "./public/assets/project-wayward.png",
+      "image": "./public/assets/project-wayward.webp",
       "overview": "Scenic-loop platform generating differentiated route options across nine route vibes using 19 scenic and road-quality signals.",
+      "contribution": "Implemented the route-generation workflow, recovery mechanisms, offline scenic-data pipeline and Redis lookup optimization.",
       "engineeringDecisions": [
         {
           "title": "Recoverable route generation",
@@ -239,7 +246,7 @@ export const generatedContent = {
           "detail": "Built a versioned offline pipeline that transforms heterogeneous geospatial sources into indexed runtime scenic data."
         }
       ],
-      "status": "The published benchmark covers one deterministic 1,500-tile, Redis-warm lookup path in local development.",
+      "status": "Scenic-loop planning with prepared geospatial data and recoverable background route jobs.",
       "tags": [
         "Spring Boot",
         "Kafka",
@@ -471,19 +478,20 @@ export const generatedContent = {
       "slug": "lazydrop",
       "title": "LazyDrop",
       "category": "Temporary file sharing",
-      "image": "./public/assets/project-lazydrop.png",
-      "overview": "Temporary file-sharing platform with guest and authenticated rooms, signed storage transfers, live state, and expiring sessions.",
+      "image": "./public/assets/project-lazydrop.webp",
+      "overview": "Built a Next.js and Spring Boot file-sharing application with guest/account QR-code rooms, PostgreSQL state, direct signed storage transfers and room-scoped notifications.",
+      "contribution": "Primary implementation of the Spring Boot backend, database schema, signed-upload migration and Next.js room integration.",
       "engineeringDecisions": [
         {
           "title": "Direct storage transfers",
-          "detail": "Used two-phase signed uploads so object storage handled file bytes while the API retained authorization, validation, and metadata control."
+          "detail": "Replaced backend-proxied uploads with browser-to-object-storage presigned PUTs; Spring Boot checks room membership/status and declared plan limits, issues signed upload/download URLs, and records client-confirmed metadata."
         },
         {
-          "title": "Safe subscription processing",
-          "detail": "Prevented duplicate Stripe entitlement updates with signature validation, server-side plan enforcement, and an idempotent leased-retry ledger."
+          "title": "Room notifications",
+          "detail": "Implemented room-scoped file, participant, note, download-mark and lifecycle notifications using STOMP/SockJS and Spring SimpleBroker, registering sends after database commits when transaction synchronization is active."
         }
       ],
-      "status": "Temporary rooms combine guest-friendly joining, expiring sessions, and server-owned access control.",
+      "status": "A modular Spring Boot application with direct storage transfers, client-confirmed file metadata and process-local notifications.",
       "tags": [
         "Next.js",
         "Spring Boot",
@@ -503,7 +511,7 @@ export const generatedContent = {
         }
       ],
       "architecture": {
-        "caption": "The API owns room access and metadata while browsers transfer file bytes directly to private object storage.",
+        "caption": "The modular Spring API checks room access and records client-confirmed metadata; browsers transfer bytes directly to S3-compatible storage.",
         "nodes": [
           {
             "id": "client",
@@ -523,7 +531,7 @@ export const generatedContent = {
           },
           {
             "id": "realtime",
-            "label": "STOMP / WebSocket"
+            "label": "Process-local STOMP / SockJS"
           },
           {
             "id": "auth",
@@ -558,12 +566,12 @@ export const generatedContent = {
           {
             "from": "api",
             "to": "realtime",
-            "label": "Broadcast room state"
+            "label": "Send room notifications after commit"
           },
           {
             "from": "realtime",
             "to": "client",
-            "label": "Notify room participants"
+            "label": "Fan out to room-topic subscribers"
           },
           {
             "from": "api",
@@ -573,12 +581,12 @@ export const generatedContent = {
           {
             "from": "stripe",
             "to": "api",
-            "label": "Retry-safe billing webhooks"
+            "label": "Persist signed webhook intake"
           }
         ]
       },
       "requestLifecycle": {
-        "caption": "A signed upload sends bytes directly to storage; confirmation records the file and notifies the room.",
+        "caption": "The normal client uploads directly to storage, then reports metadata; confirmation does not verify the object. Notifications use the local broker.",
         "actors": [
           {
             "id": "client",
@@ -602,7 +610,7 @@ export const generatedContent = {
           },
           {
             "id": "peer",
-            "label": "Room participant"
+            "label": "Room-topic subscriber"
           }
         ],
         "steps": [
@@ -615,7 +623,7 @@ export const generatedContent = {
           {
             "from": "api",
             "to": "api",
-            "label": "Authorize guest / JWT; enforce room and plan limits",
+            "label": "Resolve identity; check membership/status and declared plan limits",
             "async": false
           },
           {
@@ -639,19 +647,19 @@ export const generatedContent = {
           {
             "from": "client",
             "to": "api",
-            "label": "Confirm completed upload",
+            "label": "Report client-confirmed upload metadata",
             "async": false
           },
           {
             "from": "api",
             "to": "db",
-            "label": "Persist confirmed file metadata",
+            "label": "Persist client-reported file metadata",
             "async": false
           },
           {
             "from": "api",
             "to": "realtime",
-            "label": "Broadcast file-uploaded room event",
+            "label": "Send file event after commit",
             "async": true
           },
           {
@@ -683,6 +691,7 @@ export const generatedContent = {
       "category": "Job-search workflow",
       "image": "./public/assets/project-wheredidiapply.png",
       "overview": "Kept OAuth tokens client-held and avoided server-side email persistence while minimizing model exposure through deterministic-first parsing.",
+      "contribution": "Implemented deterministic email classification and the Gemini fallback, keeping OAuth tokens client-held and avoiding server-side email storage.",
       "engineeringDecisions": [
         {
           "title": "Rules before model calls",
@@ -714,6 +723,7 @@ export const generatedContent = {
       "category": "Music-learning prototype",
       "image": null,
       "overview": "Built an AI-assisted music-learning prototype that explains short chord progressions, offers contrasting creative directions, and turns feedback into a guided practice session while keeping artistic judgment with the musician.",
+      "contribution": "Built the course prototype's chord-explanation and guided-practice experience.",
       "engineeringDecisions": [],
       "status": "A course MVP kept as smaller additional work.",
       "tags": [
@@ -733,27 +743,41 @@ export const generatedContent = {
   ],
   "experience": [
     {
-      "role": "Software Developer, Database Systems",
-      "company": "Steel Plus Network",
-      "period": "May 2026 – Present · Previous internship May 2025 – Aug 2025",
-      "location": "Moncton, NB",
-      "context": "Returned after a 2025 internship to work on database systems with broader operational responsibility.",
+      "slug": "unb-formula-racing",
+      "role": "Software Engineer",
+      "company": "UNB Formula Racing (Formula SAE)",
+      "period": "Jun 2026 – Present",
+      "location": "Fredericton, NB",
+      "context": "Software contributions within UNB's Formula SAE student engineering team.",
       "detail": [
-        "Building a normalized operational rebate-management system that connects fabricators, suppliers, annual contracts, purchases, thresholds, exchange rates, currency conversion, tonnage, branch rollups, administration fees, and calculated payouts.",
-        "Converted 13 years of spreadsheet-based purchasing, rebate, membership, and supplier history into a normalized Microsoft Access reporting and data-management system."
+        "Designed and implemented Raspberry Pi data-logging software to receive CAN bus data for UNB Formula Racing, using Rust and Python across the logging and visualization work.",
+        "Designed and implemented a data visualization application representing data from over six sensors across the UNB Formula Racing car, using Rust and Python across the logging and visualization work."
       ]
     },
     {
+      "slug": "steel-plus-network-software-developer",
+      "role": "Software Developer",
+      "company": "Steel Plus Network",
+      "period": "May 2026 – Present",
+      "location": "Moncton, NB",
+      "context": "Returned after a 2025 internship to work on database systems with broader operational responsibility.",
+      "detail": [
+        "Building a normalized operational rebate-management application connecting supplier contracts and purchases to two supplier-specific calculation/import engines, versioned source batches, calculation runs, checks, staff reconciliation, and payout reporting within a shared Access workbench."
+      ]
+    },
+    {
+      "slug": "hack-atlantic",
       "role": "Co-Founder & Engineering Lead",
       "company": "Hack Atlantic",
       "period": "Apr 2026 – Present",
       "location": "Fredericton, NB",
-      "context": "Student-led hackathon being organized for September 2026.",
+      "context": "Hack Atlantic was successfully held as a student-led hackathon.",
       "detail": [
-        "Led a team building the Hack Atlantic applicant and event platform with authenticated nine-question applications, saved drafts, private optional PDF resumes, organizer review and permissions, released decisions, accepted-applicant RSVP, separately released QR passes, and transactional check-in."
+        "Led technical delivery of a deployed team-built Next.js/React and Go modular monolith covering application intake, review, decisions, RSVP, passes, and checkpoint event operations with managed PostgreSQL and private object storage."
       ]
     },
     {
+      "slug": "spotlight",
       "role": "Founding Software Engineer",
       "company": "Spotlight",
       "period": "Mar 2026 – May 2026",
@@ -764,14 +788,49 @@ export const generatedContent = {
       ]
     },
     {
+      "slug": "university-of-new-brunswick",
       "role": "Teaching Assistant",
       "company": "University of New Brunswick",
       "period": "Sep 2025 – Dec 2025",
       "location": "Fredericton, NB",
       "context": null,
       "detail": [
-        "Supported a 100+ student software-engineering cohort by reviewing lab work and mentoring students on architecture, version control, Agile workflows, and implementation quality from September through December 2025."
+        "Supported a 100+ student software-engineering cohort by reviewing lab work and mentoring students on architecture, version control, Agile/Scrum practices, and implementation quality from September through December 2025."
       ]
+    },
+    {
+      "slug": "steel-plus-network-database-systems-developer-intern",
+      "role": "Database Systems Developer Intern",
+      "company": "Steel Plus Network",
+      "period": "May 2025 – Aug 2025",
+      "location": "Moncton, NB",
+      "context": null,
+      "detail": [
+        "Converted 13 years of spreadsheet-based purchasing, rebate, membership, and supplier history into a normalized Microsoft Access reporting and data-management system."
+      ]
+    }
+  ],
+  "highlights": [
+    {
+      "value": "200+",
+      "label": "Applications received",
+      "context": "Hack Atlantic · team-built applicant workflow",
+      "href": "#experience-hack-atlantic",
+      "linkLabel": "View Hack Atlantic role"
+    },
+    {
+      "value": "50%+",
+      "label": "Less time generating reports",
+      "context": "Steel Plus Network · 2025 internship reporting workflow",
+      "href": "#experience-steel-plus-network-database-systems-developer-intern",
+      "linkLabel": "View the 2025 internship"
+    },
+    {
+      "value": "3,213 → 90 ms",
+      "label": "Redis lookup benchmark",
+      "context": "Wayward · 1,500 deterministic warm tiles, local serial GETs → one MGET",
+      "href": "#project/wayward/benchmark",
+      "linkLabel": "View Redis benchmark"
     }
   ]
 };

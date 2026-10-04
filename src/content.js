@@ -6,9 +6,10 @@ const enrichProject = (project) => {
   return {
     ...project,
     ...copy,
+    links: project.links.filter((link) => !copy.hideLiveLink || link.label !== "Live site"),
     proof: copy.outcome || project.status,
     problem: copy.why,
-    solution: project.status,
+    solution: copy.brief?.decision || project.status,
     features: [],
     impact: [],
     metrics: [],
@@ -55,8 +56,15 @@ export const content = {
   ],
   labels: siteCopy.labels,
   projects,
+  highlights: generatedContent.highlights,
   additionalProjects,
-  experience: generatedContent.experience,
+  experience: generatedContent.experience.map((item) => ({
+    ...item,
+    evidence: generatedContent.highlights.find((highlight) => highlight.href === `#experience-${item.slug}`),
+    detail: siteCopy.experience[`${item.company} / ${item.role}`]?.detail
+      || siteCopy.experience[item.company]?.detail
+      || item.detail,
+  })),
   tools,
   quote: siteCopy.quote,
   contact: { ...siteCopy.contact, email: profile.email },

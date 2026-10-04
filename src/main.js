@@ -1,15 +1,28 @@
 import { content } from "./content.js?v=57";
 import { appTemplate } from "./components.js?v=57";
+import { setupResultCounters } from "./count-up.js?v=1";
+import { parseProjectRoute, setupReadingNavigation } from "./navigation.js?v=1";
 
+// Hash routes restore their own section, including on reload and browser Back.
+window.history.scrollRestoration = "manual";
 document.body.classList.add("js-enabled");
 document.title = content.site.title;
 
 const root = document.querySelector("#app");
 let ambientGrainCleanup = () => {};
 let demoLoopCleanup = () => {};
+let revealCleanup = () => {};
+let responsiveCleanup = () => {};
+let counterCleanup = () => {};
+let navigationCleanup = () => {};
+const seenResults = new Set();
 
-function render() {
+function render(focusChanged = false) {
   demoLoopCleanup();
+  revealCleanup();
+  responsiveCleanup();
+  counterCleanup();
+  navigationCleanup();
   root.innerHTML = appTemplate();
 
   requestAnimationFrame(() => {
@@ -18,6 +31,7 @@ function render() {
 
   setupAmbientGrain();
   setupReveal();
+  counterCleanup = setupResultCounters(root, seenResults);
   setupDemoLoops();
   setupAnchorLinks();
   setupElasticEffects();
@@ -26,7 +40,10 @@ function render() {
   setupSystemExplorer();
   setupDiagramPan();
   setupResponsiveProjectDetails();
-  restoreAnchorScroll();
+  navigationCleanup = setupReadingNavigation(root);
+  restoreAnchorScroll(focusChanged);
+  const project = content.projects.find((item) => item.slug === parseProjectRoute(window.location.hash)?.slug);
+  document.title = project ? `${project.title} | ${content.profile.name}` : content.site.title;
 }
 
 function setupReveal() {
@@ -63,6 +80,7 @@ function setupReveal() {
     );
 
     revealTargets.forEach((target) => revealObserver.observe(target));
+    revealCleanup = () => revealObserver.disconnect();
     return;
   }
 
@@ -285,13 +303,13 @@ function setupAnchorLinks() {
         return;
       }
 
-      const target = document.querySelector(targetId);
+      const target = document.getElementById(targetId.slice(1));
       if (!target) return;
 
       event.preventDefault();
-      window.history.pushState(null, "", targetId);
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (targetId !== "#main-content") window.history.pushState(null, "", targetId);
       closeMenu();
+      landOnSection(target, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", true);
     });
   });
 }
@@ -303,6 +321,15 @@ function setupMenu() {
   menuButton?.addEventListener("click", () => {
     const isOpen = header.classList.toggle("is-open");
     menuButton.setAttribute("aria-expanded", String(isOpen));
+  });
+  header?.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && header.classList.contains("is-open")) {
+      closeMenu();
+      menuButton.focus();
+    }
+  });
+  header?.addEventListener("focusout", (event) => {
+    if (!header.contains(event.relatedTarget)) closeMenu();
   });
 }
 
@@ -369,7 +396,7 @@ function setupSystemExplorer() {
   const explorer = document.querySelector("[data-system-explorer]");
   if (!explorer) return;
 
-  const slug = window.location.hash.match(/^#project\/([a-z0-9-]+)$/i)?.[1];
+  const slug = parseProjectRoute(window.location.hash)?.slug;
   const project = content.projects.find((item) => item.slug === slug);
   if (!project?.systemFlow?.length) return;
 
@@ -561,6 +588,7 @@ function setupResponsiveProjectDetails() {
 
   apply();
   window.addEventListener("resize", apply, { passive: true });
+  responsiveCleanup = () => window.removeEventListener("resize", apply);
 }
 
 function closeMenu() {
@@ -568,12 +596,38 @@ function closeMenu() {
   document.querySelector(".menu-icon")?.setAttribute("aria-expanded", "false");
 }
 
-function restoreAnchorScroll() {
-  if (window.location.hash === "#work" || window.location.hash === "#contact" || window.location.hash === "#about") {
-    requestAnimationFrame(() => {
-      document.querySelector(window.location.hash)?.scrollIntoView({ block: "start" });
-    });
+function focusSection(target) {
+  if (!target) return;
+  const heading = target.querySelector("h1, h2, h3") || target;
+  heading.setAttribute("tabindex", "-1");
+  heading.focus({ preventScroll: true });
+}
+
+function landOnSection(target, behavior, focusChanged) {
+  document.querySelectorAll(".result-destination").forEach((item) => item.classList.remove("result-destination"));
+  if (!target) return;
+  if (target.matches(".experience-entry, #project-metrics")) {
+    target.classList.add("result-destination", "is-visible");
   }
+  target.scrollIntoView({ block: "start", behavior });
+  if (focusChanged) focusSection(target);
+}
+
+function restoreAnchorScroll(focusChanged) {
+  const hash = window.location.hash;
+  const route = parseProjectRoute(hash);
+  requestAnimationFrame(() => {
+    if (route && document.querySelector(".project-page")) {
+      const target = route.targetId && document.getElementById(route.targetId);
+      if (target) landOnSection(target, "instant", focusChanged);
+      else {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        if (focusChanged) focusSection(document.querySelector("main"));
+      }
+    } else {
+      landOnSection(document.getElementById(hash.slice(1)), "instant", focusChanged);
+    }
+  });
 }
 
 function createElasticTracker(element, handlers = {}) {
@@ -657,6 +711,7 @@ function createElasticTracker(element, handlers = {}) {
 }
 
 function setupElasticEffects() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const portraitCard = document.querySelector(".portrait-card");
 
@@ -687,7 +742,7 @@ function setupElasticEffects() {
 
 window.addEventListener("hashchange", () => {
   document.body.classList.remove("is-ready");
-  render();
+  render(true);
 });
 
 render();
